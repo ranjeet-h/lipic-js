@@ -3953,7 +3953,7 @@ interface TransliterationEngine {
     commit(): Edit$1;
     reset(): void;
 }
-type EngineRuntime = "js" | "wasm";
+type EngineRuntime = "js" | "wasm" | "hybrid";
 interface RuntimeAwareTransliterationEngine extends TransliterationEngine {
     getRuntime(): EngineRuntime;
 }

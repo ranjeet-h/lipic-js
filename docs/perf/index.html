@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>lipic-js Performance Report</title>
+    <style>
+      body { font-family: sans-serif; margin: 16px; }
+      h1, h2 { margin: 0 0 8px; }
+      section { margin: 18px 0; }
+      table { border-collapse: collapse; width: 100%; max-width: 960px; }
+      th, td { border: 1px solid #ddd; padding: 6px 8px; text-align: left; }
+      th { background: #f5f5f5; }
+      .bad { color: #b00020; }
+      .good { color: #136f2d; }
+      code { background: #f5f5f5; padding: 2px 4px; }
+      .meta { color: #444; margin-top: 4px; }
+    </style>
+  </head>
+  <body>
+    <h1>lipic-js Perf + Size Report</h1>
+    <p class="meta">Data files: <code>baseline.latest.json</code> and <code>size.latest.json</code></p>
+
+    <section>
+      <h2>Speed Summary</h2>
+      <div id="speed-summary">Loading...</div>
+    </section>
+
+    <section>
+      <h2>Keystroke Profile</h2>
+      <div id="keystroke">Loading...</div>
+    </section>
+
+    <section>
+      <h2>Batch Profile</h2>
+      <div id="batch">Loading...</div>
+    </section>
+
+    <section>
+      <h2>Library Size</h2>
+      <div id="size">Loading...</div>
+    </section>
+
+    <script type="module">
+      function num(v, digits = 3) {
+        return Number(v).toFixed(digits);
+      }
+
+      function deltaPercent(jsVal, wasmVal) {
+        if (!Number.isFinite(jsVal) || jsVal === 0 || !Number.isFinite(wasmVal)) {
+          return null;
+        }
+        return ((jsVal - wasmVal) / jsVal) * 100;
+      }
+
+      function deltaCell(jsVal, wasmVal) {
+        const d = deltaPercent(jsVal, wasmVal);
+        if (d === null) return "<td>-</td>";
+        const cls = d >= 0 ? "good" : "bad";
+        return `<td class="${cls}">${num(d, 1)}%</td>`;
+      }
+
+      function toSize(bytes) {
+        if (!Number.isFinite(bytes)) return "-";
+        if (bytes < 1024) return `${bytes} B`;
+        if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(2)} KB`;
+        return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+      }
+
+      function renderSpeedTable(rows) {
+        return `
+          <table>
+            <thead>
+              <tr>
+                <th>Metric</th>
+                <th>JS (us)</th>
+                <th>WASM (us)</th>
+                <th>Delta (WASM vs JS)</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rows.map((r) => `
+                <tr>
+                  <td>${r.name}</td>
+                  <td>${num(r.js)}</td>
+                  <td>${num(r.wasm)}</td>
+                  ${deltaCell(r.js, r.wasm)}
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+        `;
+      }
+
+      async function main() {
+        const [baselineRes, sizeRes] = await Promise.all([
+          fetch("./baseline.latest.json"),
+          fetch("./size.latest.json")
+        ]);
+
+        if (!baselineRes.ok || !sizeRes.ok) {
+          throw new Error("Could not load perf JSON files.");
+        }
+
+        const baseline = await baselineRes.json();
+        const size = await sizeRes.json();
+
+        const jsSuite = baseline.suites?.find((s) => s.name === "js");
+        const wasmSuite = baseline.suites?.find((s) => s.name === "wasm");
+        if (!jsSuite || !wasmSuite) {
+          throw new Error("Missing JS/WASM suites in baseline.latest.json.");
+        }
+
+        const speedRows = [
+          { name: "processChar p95", js: jsSuite.processChar.p95_us, wasm: wasmSuite.processChar.p95_us },
+          { name: "backspace p95", js: jsSuite.backspace.p95_us, wasm: wasmSuite.backspace.p95_us },
+          { name: "processText long avg", js: jsSuite.processText.long.avg_us, wasm: wasmSuite.processText.long.avg_us }
+        ];
+        document.getElementById("speed-summary").innerHTML = renderSpeedTable(speedRows);
+
+        const kJs = jsSuite.profiles?.keystroke ?? {};
+        const kWasm = wasmSuite.profiles?.keystroke ?? {};
+        const keystrokeRows = [
+          { name: "processChar p50", js: kJs.processChar?.p50_us ?? jsSuite.processChar.p50_us, wasm: kWasm.processChar?.p50_us ?? wasmSuite.processChar.p50_us },
+          { name: "processChar p95", js: kJs.processChar?.p95_us ?? jsSuite.processChar.p95_us, wasm: kWasm.processChar?.p95_us ?? wasmSuite.processChar.p95_us },
+          { name: "backspace p50", js: kJs.backspace?.p50_us ?? jsSuite.backspace.p50_us, wasm: kWasm.backspace?.p50_us ?? wasmSuite.backspace.p50_us },
+          { name: "backspace p95", js: kJs.backspace?.p95_us ?? jsSuite.backspace.p95_us, wasm: kWasm.backspace?.p95_us ?? wasmSuite.backspace.p95_us }
+        ];
+        document.getElementById("keystroke").innerHTML = renderSpeedTable(keystrokeRows);
+
+        const bJs = jsSuite.profiles?.batch?.processText ?? jsSuite.processText;
+        const bWasm = wasmSuite.profiles?.batch?.processText ?? wasmSuite.processText;
+        const batchRows = [
+          { name: "short avg", js: bJs.short.avg_us, wasm: bWasm.short.avg_us },
+          { name: "medium avg", js: bJs.medium.avg_us, wasm: bWasm.medium.avg_us },
+          { name: "long avg", js: bJs.long.avg_us, wasm: bWasm.long.avg_us }
+        ];
+        document.getElementById("batch").innerHTML = renderSpeedTable(batchRows);
+
+        const files = size.files ?? [];
+        const totals = files.reduce((acc, f) => {
+          if (f.missing) return acc;
+          acc.raw += Number(f.bytes) || 0;
+          acc.gzip += Number(f.gzip_bytes) || 0;
+          return acc;
+        }, { raw: 0, gzip: 0 });
+
+        const sizeRows = files.map((f) => `
+          <tr>
+            <td>${f.file}</td>
+            <td>${f.missing ? "missing" : toSize(f.bytes)}</td>
+            <td>${f.missing ? "missing" : toSize(f.gzip_bytes)}</td>
+          </tr>
+        `).join("");
+
+        document.getElementById("size").innerHTML = `
+          <p><strong>Total raw:</strong> ${toSize(totals.raw)} | <strong>Total gzip:</strong> ${toSize(totals.gzip)}</p>
+          <table>
+            <thead>
+              <tr>
+                <th>File</th>
+                <th>Raw</th>
+                <th>Gzip</th>
+              </tr>
+            </thead>
+            <tbody>${sizeRows}</tbody>
+          </table>
+          <p class="meta">Generated: ${new Date(size.generatedAt).toLocaleString()}</p>
+          <p class="meta">Node: ${size.node}</p>
+        `;
+      }
+
+      main().catch((error) => {
+        const msg = `<p class="bad">Failed to render report: ${String(error.message || error)}</p>`;
+        document.getElementById("speed-summary").innerHTML = msg;
+        document.getElementById("keystroke").innerHTML = msg;
+        document.getElementById("batch").innerHTML = msg;
+        document.getElementById("size").innerHTML = msg;
+      });
+    </script>
+  </body>
+</html>

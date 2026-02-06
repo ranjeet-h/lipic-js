@@ -87,17 +87,27 @@ Required files for direct hosting:
 
 ## WASM Mode Control
 `createHybridTransliterationEngine` and `enableTransliteration` support:
-- `isWasm: "auto"` (default): prefer WASM, fallback to JS
-- `isWasm: true`: force WASM (no JS fallback)
+- `isWasm: "auto"` (default): JS for keystroke path (`processChar/backspace/commit/reset`), WASM for batch path (`processText`) when available
+- `isWasm: true`: prefer WASM strongly (if WASM files are missing, it safely falls back to JS)
 - `isWasm: false`: force JS
+
+WASM optional fail-safe:
+- If `dist/wasm` files are not present, library continues with JS engine without breaking.
 
 ## Build Output (Single Folder)
 Use:
 ```bash
-npm run build:all
+npm run build:js-only
 ```
 
-This builds JS bundles and copies WASM artifacts into:
+This builds JS-only bundles (small default distribution).
+
+If you want bundled WASM too:
+```bash
+npm run build:with-wasm
+```
+
+With WASM build, artifacts are in:
 - `dist/`
 - `dist/wasm/rust_core.js`
 - `dist/wasm/rust_core_bg.wasm`

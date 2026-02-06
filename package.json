@@ -68,7 +68,9 @@
   "jsdelivr": "./dist/lipic-js.iife.js",
   "scripts": {
     "build": "tsup",
-    "build:all": "npm run rust:wasm:package:release && npm run build && npm run rust:copy:dist",
+    "build:js-only": "npm run build",
+    "build:with-wasm": "npm run rust:wasm:package:release && npm run build && npm run rust:copy:dist",
+    "build:all": "npm run build:with-wasm",
     "test": "vitest",
     "test:run": "vitest run",
     "test:wasm:parity": "vitest run tests/wasm-engine.parity.test.ts",

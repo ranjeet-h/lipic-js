@@ -1,31 +1,31 @@
 {
-  "generatedAt": "2026-02-06T12:09:56.155Z",
-  "node": "v24.2.0",
+  "generatedAt": "2026-02-06T12:37:43.329Z",
+  "node": "v22.16.0",
   "files": [
     {
       "file": "dist/index.js",
-      "bytes": 49036,
-      "gzip_bytes": 8348
+      "bytes": 49531,
+      "gzip_bytes": 8491
     },
     {
       "file": "dist/index.cjs",
-      "bytes": 50326,
-      "gzip_bytes": 8917
+      "bytes": 50821,
+      "gzip_bytes": 9055
     },
     {
       "file": "dist/lipic-js.iife.js",
-      "bytes": 49564,
-      "gzip_bytes": 8696
+      "bytes": 50059,
+      "gzip_bytes": 8834
     },
     {
       "file": "dist/wasm/rust_core.js",
       "bytes": 26507,
-      "gzip_bytes": 5251
+      "gzip_bytes": 5256
     },
     {
       "file": "dist/wasm/rust_core_bg.wasm",
       "bytes": 284058,
-      "gzip_bytes": 109348
+      "gzip_bytes": 109095
     }
   ],
   "missing": 0

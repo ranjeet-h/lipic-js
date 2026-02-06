@@ -1,4 +1,4 @@
-import { createTransliterationEngine } from "./transliteration-engine";
+import { createTransliterationEngine, getEngineRuntime } from "./transliteration-engine";
 import {
   compileWasmLanguageOverlayPack,
   compileWasmLanguagePack,
@@ -9,7 +9,11 @@ import {
 import {
   createWasmTransliterationEngine,
 } from "./wasm-transliteration-engine";
-import type { TransliterationEngine, TransliterationEngineOptions } from "./transliteration-engine";
+import type {
+  RuntimeAwareTransliterationEngine,
+  TransliterationEngine,
+  TransliterationEngineOptions
+} from "./transliteration-engine";
 
 const defaultPackCache = new Map<string, Uint8Array>();
 type WasmMode = "auto" | boolean;
@@ -29,26 +33,32 @@ export interface HybridEngineFactoryOptions {
 }
 
 function resolveWasmMode(options: HybridEngineFactoryOptions): {
-  preferWasm: boolean;
+  mode: WasmMode;
   fallbackToJs: boolean;
 } {
   const requestedMode = options.isWasm ?? options.wasm;
-  if (requestedMode === true) {
-    return { preferWasm: true, fallbackToJs: false };
-  }
-  if (requestedMode === false) {
-    return { preferWasm: false, fallbackToJs: true };
+  if (requestedMode !== undefined) {
+    return {
+      mode: requestedMode,
+      // WASM is optional in distribution; always keep a JS fail-safe unless caller explicitly disables it.
+      fallbackToJs: options.fallbackToJs ?? true
+    };
   }
 
-  return {
-    preferWasm: options.preferWasm ?? true,
-    fallbackToJs: options.fallbackToJs ?? true
-  };
+  if (options.preferWasm === false) {
+    return { mode: false, fallbackToJs: true };
+  }
+  if (options.fallbackToJs === false) {
+    return { mode: true, fallbackToJs: false };
+  }
+
+  return { mode: "auto", fallbackToJs: true };
 }
 
-export async function createHybridTransliterationEngine(
+async function createWasmBackedEngine(
   options: TransliterationEngineOptions,
-  factoryOptions: HybridEngineFactoryOptions = {}
+  factoryOptions: HybridEngineFactoryOptions,
+  fallbackToJs: boolean
 ): Promise<TransliterationEngine> {
   const {
     moduleLoader,
@@ -59,11 +69,6 @@ export async function createHybridTransliterationEngine(
     packCache = defaultPackCache,
     packCacheKey
   } = factoryOptions;
-  const { preferWasm, fallbackToJs } = resolveWasmMode(factoryOptions);
-
-  if (!preferWasm) {
-    return createTransliterationEngine(options);
-  }
 
   if (scriptId && languageId) {
     if (scriptBaseMap && languageOverlayMap) {
@@ -138,4 +143,70 @@ export async function createHybridTransliterationEngine(
     moduleLoader: moduleLoader as (() => Promise<any>) | undefined,
     fallbackToJs
   });
+}
+
+export async function createHybridTransliterationEngine(
+  options: TransliterationEngineOptions,
+  factoryOptions: HybridEngineFactoryOptions = {}
+): Promise<TransliterationEngine> {
+  const { mode, fallbackToJs } = resolveWasmMode(factoryOptions);
+
+  if (mode === false) {
+    return createTransliterationEngine(options);
+  }
+
+  if (mode === true) {
+    return createWasmBackedEngine(options, factoryOptions, fallbackToJs);
+  }
+
+  const jsEngine = createTransliterationEngine(options);
+  let wasmEngine: TransliterationEngine | null = null;
+  try {
+    wasmEngine = await createWasmBackedEngine(options, factoryOptions, true);
+  } catch {
+    wasmEngine = null;
+  }
+
+  if (!wasmEngine || getEngineRuntime(wasmEngine) === "js") {
+    return jsEngine;
+  }
+
+  const engine: RuntimeAwareTransliterationEngine = {
+    processChar(ch) {
+      return jsEngine.processChar(ch);
+    },
+    processText(text) {
+      const jsEdit = jsEngine.processText(text);
+      try {
+        const wasmEdit = wasmEngine.processText(text);
+        return { backspace: jsEdit.backspace, insert: wasmEdit.insert };
+      } catch {
+        return jsEdit;
+      }
+    },
+    backspace() {
+      return jsEngine.backspace();
+    },
+    commit() {
+      const edit = jsEngine.commit();
+      try {
+        wasmEngine.commit();
+      } catch {
+        // Ignore sync failures in auto mode; JS engine remains source of truth.
+      }
+      return edit;
+    },
+    reset() {
+      jsEngine.reset();
+      try {
+        wasmEngine.reset();
+      } catch {
+        // Ignore sync failures in auto mode; JS engine remains source of truth.
+      }
+    },
+    getRuntime() {
+      return "hybrid";
+    }
+  };
+  return engine;
 }

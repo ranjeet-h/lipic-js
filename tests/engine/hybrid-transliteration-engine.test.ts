@@ -4,7 +4,7 @@ import marathiExpanded from "../../maps/marathi/phonetic.expanded.json";
 import { createHybridTransliterationEngine } from "../../src/engine/hybrid-transliteration-engine";
 
 describe("hybrid transliteration engine", () => {
-  it("prefers wasm path by default", async () => {
+  it("uses JS for keystroke path and WASM for batch path in auto mode", async () => {
     class MockEngine {
       constructor(_expandedMap: Record<string, unknown>, _rules?: Record<string, unknown>) {}
       process_char(ch: string) {
@@ -27,7 +27,8 @@ describe("hybrid transliteration engine", () => {
       { moduleLoader: async () => ({ Engine: MockEngine }) }
     );
 
-    expect(engine.processChar("k")).toEqual({ backspace: 0, insert: "K" });
+    expect(engine.processChar("k")).toEqual({ backspace: 0, insert: "क" });
+    expect(engine.processText("ab")).toEqual({ backspace: 1, insert: "AB" });
   });
 
   it("can force JS engine", async () => {
@@ -49,7 +50,7 @@ describe("hybrid transliteration engine", () => {
     expect(engine.processChar("k")).toEqual({ backspace: 0, insert: "क" });
   });
 
-  it("supports isWasm=true to force wasm-only mode", async () => {
+  it("supports isWasm=true and uses wasm when available", async () => {
     class MockEngine {
       constructor(_expandedMap: Record<string, unknown>, _rules?: Record<string, unknown>) {}
       process_char(ch: string) {
@@ -73,6 +74,16 @@ describe("hybrid transliteration engine", () => {
     );
 
     expect(engine.processChar("k")).toEqual({ backspace: 0, insert: "W:k" });
+  });
+
+  it("uses JS fail-safe when isWasm=true but wasm module is missing", async () => {
+    const engine = await createHybridTransliterationEngine(
+      { expandedMap: marathiExpanded },
+      { isWasm: true, moduleLoader: async () => { throw new Error("missing wasm files"); } }
+    );
+
+    expect(engine.processChar("k")).toEqual({ backspace: 0, insert: "क" });
+    expect(engine.processChar("h")).toEqual({ backspace: 1, insert: "ख" });
   });
 
   it("compiles language pack lazily and reuses cache for same language", async () => {
@@ -116,8 +127,9 @@ describe("hybrid transliteration engine", () => {
     const engine1 = await createHybridTransliterationEngine(options, factoryOptions);
     const engine2 = await createHybridTransliterationEngine(options, factoryOptions);
 
-    expect(engine1.processChar("k")).toEqual({ backspace: 0, insert: "K" });
-    expect(engine2.processChar("k")).toEqual({ backspace: 0, insert: "K" });
+    expect(engine1.processChar("k")).toEqual({ backspace: 0, insert: "क" });
+    expect(engine2.processChar("k")).toEqual({ backspace: 0, insert: "क" });
+    expect(engine1.processText("ab")).toEqual({ backspace: 1, insert: "AB" });
     expect(compileCalls).toBe(1);
   });
 
@@ -175,7 +187,8 @@ describe("hybrid transliteration engine", () => {
       }
     );
 
-    expect(engine.processChar("k")).toEqual({ backspace: 0, insert: "K!" });
+    expect(engine.processChar("k")).toEqual({ backspace: 0, insert: "क" });
+    expect(engine.processText("ab")).toEqual({ backspace: 1, insert: "AB!" });
     expect(baseCompileCalls).toBe(1);
     expect(overlayCompileCalls).toBe(1);
   });

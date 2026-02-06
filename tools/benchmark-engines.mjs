@@ -182,6 +182,19 @@ async function runSuite(name, factory) {
 
   return {
     name,
+    profiles: {
+      keystroke: {
+        processChar: processChar.summary,
+        backspace: backspace.summary
+      },
+      batch: {
+        processText: {
+          short: { chars: CONFIG.texts.short.length, ...processTextShort.summary },
+          medium: { chars: CONFIG.texts.medium.length, ...processTextMedium.summary },
+          long: { chars: CONFIG.texts.long.length, ...processTextLong.summary }
+        }
+      }
+    },
     processChar: processChar.summary,
     processText: {
       short: { chars: CONFIG.texts.short.length, ...processTextShort.summary },

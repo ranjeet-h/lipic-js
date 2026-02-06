@@ -31,7 +31,7 @@ export interface TransliterationEngine {
   reset(): void;
 }
 
-export type EngineRuntime = "js" | "wasm";
+export type EngineRuntime = "js" | "wasm" | "hybrid";
 
 export interface RuntimeAwareTransliterationEngine extends TransliterationEngine {
   getRuntime(): EngineRuntime;
