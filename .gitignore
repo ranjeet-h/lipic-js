@@ -1,1 +1,4 @@
 node_modules
+rust-core/target
+rust-core/pkg
+rust-core/pkg-node

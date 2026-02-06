@@ -1,0 +1,32 @@
+{
+  "generatedAt": "2026-02-06T11:46:37.196Z",
+  "node": "v24.2.0",
+  "files": [
+    {
+      "file": "dist/index.js",
+      "bytes": 46379,
+      "gzip_bytes": 7515
+    },
+    {
+      "file": "dist/index.cjs",
+      "bytes": 47552,
+      "gzip_bytes": 8030
+    },
+    {
+      "file": "dist/indic-ime.iife.js",
+      "bytes": 46905,
+      "gzip_bytes": 7854
+    },
+    {
+      "file": "rust-core/pkg/rust_core.js",
+      "bytes": 26507,
+      "gzip_bytes": 5251
+    },
+    {
+      "file": "rust-core/pkg/rust_core_bg.wasm",
+      "bytes": 284058,
+      "gzip_bytes": 109348
+    }
+  ],
+  "missing": 0
+}

@@ -15,9 +15,9 @@ export default defineConfig([
     }
   },
   {
-    entry: { "indic-ime": "src/index.ts" },
+    entry: { "lipic-js": "src/index.ts" },
     format: ["iife"],
-    globalName: "IndicIME",
+    globalName: "LipicJS",
     dts: false,
     sourcemap: true,
     clean: false,

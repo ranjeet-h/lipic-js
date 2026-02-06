@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Indic IME Playground</title>
+    <title>lipic-js Playground</title>
     <style>
       body { font-family: sans-serif; margin: 16px; }
       label { display: block; margin-top: 12px; }
@@ -13,15 +13,24 @@
     </style>
   </head>
   <body>
-    <h1>Indic IME Playground</h1>
+    <h1>lipic-js Playground</h1>
 
     <label>
       Language
       <select id="language">
-        <option value="hindi" selected>Hindi (Devanagari)</option>
-        <option value="marathi">Marathi (Devanagari)</option>
-        <option value="nepali">Nepali (Devanagari)</option>
-        <option value="sanskrit">Sanskrit (Devanagari)</option>
+        <option value="hi" selected>Hindi (hi)</option>
+        <option value="mr">Marathi (mr)</option>
+        <option value="ne">Nepali (ne)</option>
+        <option value="sa">Sanskrit (sa)</option>
+      </select>
+    </label>
+
+    <label>
+      WASM Mode
+      <select id="wasm-mode">
+        <option value="auto" selected>auto (prefer wasm, fallback js)</option>
+        <option value="true">true (force wasm)</option>
+        <option value="false">false (force js)</option>
       </select>
     </label>
 
@@ -41,6 +50,7 @@
     </label>
 
     <p><small id="lang-note"></small></p>
+    <p><small id="runtime-note"></small></p>
 
     <script type="module" src="./main.js"></script>
   </body>

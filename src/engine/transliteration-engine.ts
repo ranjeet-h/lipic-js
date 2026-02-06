@@ -31,6 +31,20 @@ export interface TransliterationEngine {
   reset(): void;
 }
 
+export type EngineRuntime = "js" | "wasm";
+
+export interface RuntimeAwareTransliterationEngine extends TransliterationEngine {
+  getRuntime(): EngineRuntime;
+}
+
+export function getEngineRuntime(engine: TransliterationEngine): EngineRuntime {
+  const runtimeAware = engine as Partial<RuntimeAwareTransliterationEngine>;
+  if (typeof runtimeAware.getRuntime === "function") {
+    return runtimeAware.getRuntime();
+  }
+  return "js";
+}
+
 type ContextState = "start" | "afterConsonant" | "afterVowel" | "other";
 
 const DEFAULT_RULES: EngineRuleOptions = {
@@ -192,7 +206,7 @@ export function createTransliterationEngine(options: TransliterationEngineOption
     return edit;
   }
 
-  return {
+  const engine: RuntimeAwareTransliterationEngine = {
     processChar(char: string): Edit {
       if (isSeparator(char)) {
         inputStack.clear();
@@ -245,6 +259,10 @@ export function createTransliterationEngine(options: TransliterationEngineOption
     reset(): void {
       inputStack.clear();
       renderedBuffer = "";
+    },
+    getRuntime(): EngineRuntime {
+      return "js";
     }
   };
+  return engine;
 }

@@ -1,0 +1,40 @@
+{
+  "generatedAt": "2026-02-06T11:26:28.955Z",
+  "node": "v24.2.0",
+  "suites": [
+    {
+      "name": "js",
+      "processChar": {
+        "p50_us": 0.41699999999877946,
+        "p95_us": 1.7500000000012506,
+        "avg_us": 0.8445183200001849
+      },
+      "processText": {
+        "short": {
+          "chars": 7,
+          "p50_us": 0.9589999999946031,
+          "p95_us": 1.999999999981128,
+          "avg_us": 1.3487312500001636
+        },
+        "medium": {
+          "chars": 124,
+          "p50_us": 13.20799999999167,
+          "p95_us": 19.83300000000554,
+          "avg_us": 14.933762500000036
+        },
+        "long": {
+          "chars": 1024,
+          "p50_us": 89.49999999998681,
+          "p95_us": 134.08300000000395,
+          "avg_us": 95.92218500000043
+        }
+      },
+      "backspace": {
+        "p50_us": 0.3749999999911324,
+        "p95_us": 0.7090000000005148,
+        "avg_us": 0.4096040277779836
+      }
+    }
+  ],
+  "wasmError": "exports is not defined in ES module scope\nThis file is being treated as an ES module because it has a '.js' file extension and '/Users/ranjeetharishchandre/Documents/Personal/lipic-js/package.json' contains \"type\": \"module\". To treat it as a CommonJS script, rename it to use the '.cjs' file extension."
+}

@@ -1,7 +1,7 @@
 {
-  "name": "indic-ime",
+  "name": "lipic-js",
   "version": "0.1.0",
-  "description": "Indic IME building blocks (data-first)",
+  "description": "lipic-js transliteration building blocks (data-first)",
   "license": "MIT",
   "type": "module",
   "files": [
@@ -56,18 +56,39 @@
     "./maps/marathi/phonetic.expanded": {
       "default": "./maps/marathi/phonetic.expanded.json"
     },
+    "./wasm/*": {
+      "default": "./dist/wasm/*"
+    },
     "./package.json": "./package.json"
   },
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "unpkg": "./dist/indic-ime.iife.js",
-  "jsdelivr": "./dist/indic-ime.iife.js",
+  "unpkg": "./dist/lipic-js.iife.js",
+  "jsdelivr": "./dist/lipic-js.iife.js",
   "scripts": {
     "build": "tsup",
+    "build:all": "npm run rust:wasm:package:release && npm run build && npm run rust:copy:dist",
     "test": "vitest",
     "test:run": "vitest run",
+    "test:wasm:parity": "vitest run tests/wasm-engine.parity.test.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit",
+    "bench:baseline": "npm run rust:wasm:package:release && npm run build && node --expose-gc tools/benchmark-engines.mjs --out docs/perf/baseline.latest.json",
+    "bench:run": "npm run rust:wasm:package:release && node --expose-gc tools/benchmark-engines.mjs --out docs/perf/baseline.latest.json",
+    "size:baseline": "npm run rust:wasm:package:release && npm run build && npm run rust:copy:dist && node tools/report-size.mjs --out docs/perf/size.latest.json",
+    "rust:build": "cargo build --manifest-path rust-core/Cargo.toml",
+    "rust:build:wasm": "cargo build --manifest-path rust-core/Cargo.toml --target wasm32-unknown-unknown",
+    "rust:build:wasm:release": "cargo build --release --manifest-path rust-core/Cargo.toml --target wasm32-unknown-unknown",
+    "rust:wasm:bindgen:web": "wasm-bindgen --target web --out-dir rust-core/pkg --out-name rust_core rust-core/target/wasm32-unknown-unknown/debug/rust_core.wasm",
+    "rust:wasm:bindgen:web:release": "wasm-bindgen --target web --out-dir rust-core/pkg --out-name rust_core rust-core/target/wasm32-unknown-unknown/release/rust_core.wasm",
+    "rust:wasm:bindgen:node": "wasm-bindgen --target nodejs --out-dir rust-core/pkg-node --out-name rust_core rust-core/target/wasm32-unknown-unknown/debug/rust_core.wasm",
+    "rust:wasm:bindgen:node:release": "wasm-bindgen --target nodejs --out-dir rust-core/pkg-node --out-name rust_core rust-core/target/wasm32-unknown-unknown/release/rust_core.wasm",
+    "rust:wasm:package": "npm run rust:build:wasm && npm run rust:wasm:bindgen:web && npm run rust:wasm:bindgen:node",
+    "rust:wasm:package:release": "npm run rust:build:wasm:release && npm run rust:wasm:bindgen:web:release && npm run rust:wasm:bindgen:node:release",
+    "rust:copy:dist": "node tools/copy-wasm-to-dist.mjs",
+    "rust:test": "cargo test --manifest-path rust-core/Cargo.toml",
+    "rust:check:wasm": "cargo check --manifest-path rust-core/Cargo.toml --target wasm32-unknown-unknown",
+    "rust:verify": "npm run rust:build && npm run rust:test && npm run rust:wasm:package && npm run rust:check:wasm && npm run test:wasm:parity",
     "generate-map": "node tools/generate-map.js",
     "print-inventory": "node tools/print-inventory.js"
   },

@@ -1,0 +1,375 @@
+{
+  "generatedAt": "2026-02-06T11:36:56.894Z",
+  "node": "v24.2.0",
+  "config": {
+    "rounds": 5,
+    "warmup": {
+      "processCharIterations": 150,
+      "processTextIterations": 120,
+      "backspaceIterations": 150
+    },
+    "measure": {
+      "processCharIterations": 800,
+      "processTextShortIterations": 500,
+      "processTextMediumIterations": 350,
+      "processTextLongIterations": 180,
+      "backspaceIterations": 700
+    },
+    "texts": {
+      "charSeed": "ganga kartos qa anka ksh ",
+      "short": "namaste",
+      "medium": "ganga kartos qa anka ksh kartayganga kartos qa anka ksh kartayganga kartos qa anka ksh kartayganga kartos qa anka ksh kartay",
+      "long": "ganga kartos qa anka ksh kartay ganga kartos qa anka ksh kartay ganga kartos qa anka ksh kartay ganga kartos qa anka ksh kartay ganga kartos qa anka ksh kartay ganga kartos qa anka ksh kartay ganga kartos qa anka ksh kartay ganga kartos qa anka ksh kartay ganga kartos qa anka ksh kartay ganga kartos qa anka ksh kartay ganga kartos qa anka ksh kartay ganga kartos qa anka ksh kartay ganga kartos qa anka ksh kartay ganga kartos qa anka ksh kartay ganga kartos qa anka ksh kartay ganga kartos qa anka ksh kartay ganga kartos qa anka ksh kartay ganga kartos qa anka ksh kartay ganga kartos qa anka ksh kartay ganga kartos qa anka ksh kartay ganga kartos qa anka ksh kartay ganga kartos qa anka ksh kartay ganga kartos qa anka ksh kartay ganga kartos qa anka ksh kartay ganga kartos qa anka ksh kartay ganga kartos qa anka ksh kartay ganga kartos qa anka ksh kartay ganga kartos qa anka ksh kartay ganga kartos qa anka ksh kartay ganga kartos qa anka ksh kartay ganga kartos qa anka ksh kartay ganga kartos qa anka ksh kartay "
+    },
+    "timing": "process.hrtime.bigint",
+    "cpu_pinning_style": "single-process fixed-order rounds",
+    "gc_hint": "global.gc() used when available"
+  },
+  "suites": [
+    {
+      "name": "js",
+      "processChar": {
+        "p50_us": 1,
+        "p95_us": 2.709,
+        "avg_us": 2.192475000000027
+      },
+      "processText": {
+        "short": {
+          "chars": 7,
+          "p50_us": 2.167,
+          "p95_us": 6.333,
+          "avg_us": 3.1396499999999987
+        },
+        "medium": {
+          "chars": 124,
+          "p50_us": 33.375,
+          "p95_us": 62.875,
+          "avg_us": 38.35739428571431
+        },
+        "long": {
+          "chars": 1024,
+          "p50_us": 243.667,
+          "p95_us": 875.875,
+          "avg_us": 413.21503888888884
+        }
+      },
+      "backspace": {
+        "p50_us": 0.875,
+        "p95_us": 1.584,
+        "avg_us": 0.975009999999996
+      },
+      "rounds": {
+        "processChar": [
+          {
+            "p50_us": 1.125,
+            "p95_us": 3,
+            "avg_us": 2.192475000000027
+          },
+          {
+            "p50_us": 1.042,
+            "p95_us": 2.75,
+            "avg_us": 2.7306532999999904
+          },
+          {
+            "p50_us": 1,
+            "p95_us": 2.709,
+            "avg_us": 1.8825756000000307
+          },
+          {
+            "p50_us": 0.917,
+            "p95_us": 2.5,
+            "avg_us": 3.1932492999999953
+          },
+          {
+            "p50_us": 0.875,
+            "p95_us": 2.25,
+            "avg_us": 1.4194986500000373
+          }
+        ],
+        "processText": {
+          "short": [
+            {
+              "p50_us": 2.625,
+              "p95_us": 6.334,
+              "avg_us": 4.115186
+            },
+            {
+              "p50_us": 2.167,
+              "p95_us": 6.958,
+              "avg_us": 3.1396499999999987
+            },
+            {
+              "p50_us": 2.584,
+              "p95_us": 6.333,
+              "avg_us": 3.3389779999999987
+            },
+            {
+              "p50_us": 2.083,
+              "p95_us": 3.375,
+              "avg_us": 2.408254000000001
+            },
+            {
+              "p50_us": 2.083,
+              "p95_us": 4.958,
+              "avg_us": 2.6411860000000007
+            }
+          ],
+          "medium": [
+            {
+              "p50_us": 36.25,
+              "p95_us": 80.042,
+              "avg_us": 46.64608285714285
+            },
+            {
+              "p50_us": 32.625,
+              "p95_us": 61.25,
+              "avg_us": 36.40512857142856
+            },
+            {
+              "p50_us": 33.375,
+              "p95_us": 68.166,
+              "avg_us": 40.20513142857143
+            },
+            {
+              "p50_us": 29.75,
+              "p95_us": 62.875,
+              "avg_us": 37.84974857142858
+            },
+            {
+              "p50_us": 36.084,
+              "p95_us": 52.917,
+              "avg_us": 38.35739428571431
+            }
+          ],
+          "long": [
+            {
+              "p50_us": 288.667,
+              "p95_us": 925.916,
+              "avg_us": 413.21503888888884
+            },
+            {
+              "p50_us": 233.75,
+              "p95_us": 382,
+              "avg_us": 262.3719777777777
+            },
+            {
+              "p50_us": 258.417,
+              "p95_us": 875.875,
+              "avg_us": 689.738622222222
+            },
+            {
+              "p50_us": 243.667,
+              "p95_us": 1102.167,
+              "avg_us": 423.54703888888906
+            },
+            {
+              "p50_us": 235.542,
+              "p95_us": 410.042,
+              "avg_us": 262.8016111111112
+            }
+          ]
+        },
+        "backspace": [
+          {
+            "p50_us": 0.958,
+            "p95_us": 1.833,
+            "avg_us": 1.043773095238093
+          },
+          {
+            "p50_us": 0.916,
+            "p95_us": 1.584,
+            "avg_us": 1.0159547619047642
+          },
+          {
+            "p50_us": 0.875,
+            "p95_us": 1.667,
+            "avg_us": 0.975009999999996
+          },
+          {
+            "p50_us": 0.875,
+            "p95_us": 1.584,
+            "avg_us": 0.9497999999999974
+          },
+          {
+            "p50_us": 0.75,
+            "p95_us": 1.292,
+            "avg_us": 0.8040121428571417
+          }
+        ]
+      }
+    },
+    {
+      "name": "wasm",
+      "processChar": {
+        "p50_us": 10.875,
+        "p95_us": 23.709,
+        "avg_us": 12.513466750000038
+      },
+      "processText": {
+        "short": {
+          "chars": 7,
+          "p50_us": 36.958,
+          "p95_us": 106.959,
+          "avg_us": 47.352160000000005
+        },
+        "medium": {
+          "chars": 124,
+          "p50_us": 444.75,
+          "p95_us": 673.209,
+          "avg_us": 542.8151114285715
+        },
+        "long": {
+          "chars": 1024,
+          "p50_us": 2943.625,
+          "p95_us": 4225.042,
+          "avg_us": 3074.1082944444433
+        }
+      },
+      "backspace": {
+        "p50_us": 10.583,
+        "p95_us": 22.375,
+        "avg_us": 12.383508809523788
+      },
+      "rounds": {
+        "processChar": [
+          {
+            "p50_us": 11,
+            "p95_us": 24.833,
+            "avg_us": 12.725933449999959
+          },
+          {
+            "p50_us": 8.542,
+            "p95_us": 18.25,
+            "avg_us": 9.712624600000003
+          },
+          {
+            "p50_us": 8.625,
+            "p95_us": 18.75,
+            "avg_us": 9.702923350000065
+          },
+          {
+            "p50_us": 11.375,
+            "p95_us": 26.916,
+            "avg_us": 13.941114649999957
+          },
+          {
+            "p50_us": 10.875,
+            "p95_us": 23.709,
+            "avg_us": 12.513466750000038
+          }
+        ],
+        "processText": {
+          "short": [
+            {
+              "p50_us": 42.875,
+              "p95_us": 118.541,
+              "avg_us": 56.38848999999998
+            },
+            {
+              "p50_us": 42.917,
+              "p95_us": 124.458,
+              "avg_us": 55.649021999999995
+            },
+            {
+              "p50_us": 36.958,
+              "p95_us": 101.792,
+              "avg_us": 47.352160000000005
+            },
+            {
+              "p50_us": 34.875,
+              "p95_us": 105.459,
+              "avg_us": 46.622983999999995
+            },
+            {
+              "p50_us": 34.917,
+              "p95_us": 106.959,
+              "avg_us": 46.85760999999993
+            }
+          ],
+          "medium": [
+            {
+              "p50_us": 444.75,
+              "p95_us": 673.209,
+              "avg_us": 618.5907314285711
+            },
+            {
+              "p50_us": 400.875,
+              "p95_us": 592.917,
+              "avg_us": 437.98866571428556
+            },
+            {
+              "p50_us": 469.375,
+              "p95_us": 1104.667,
+              "avg_us": 702.1559028571425
+            },
+            {
+              "p50_us": 474.916,
+              "p95_us": 775.084,
+              "avg_us": 542.8151114285715
+            },
+            {
+              "p50_us": 384.333,
+              "p95_us": 574.041,
+              "avg_us": 418.82321142857177
+            }
+          ],
+          "long": [
+            {
+              "p50_us": 3023.083,
+              "p95_us": 4234.083,
+              "avg_us": 3311.8453722222216
+            },
+            {
+              "p50_us": 2579.666,
+              "p95_us": 4032.917,
+              "avg_us": 2848.6098888888896
+            },
+            {
+              "p50_us": 3024.541,
+              "p95_us": 4420.916,
+              "avg_us": 3300.829605555555
+            },
+            {
+              "p50_us": 2943.625,
+              "p95_us": 4225.042,
+              "avg_us": 3074.1082944444433
+            },
+            {
+              "p50_us": 2549.708,
+              "p95_us": 3782.167,
+              "avg_us": 2815.7865777777774
+            }
+          ]
+        },
+        "backspace": [
+          {
+            "p50_us": 10.375,
+            "p95_us": 19.5,
+            "avg_us": 10.814691666666691
+          },
+          {
+            "p50_us": 10.583,
+            "p95_us": 22.666,
+            "avg_us": 12.383508809523788
+          },
+          {
+            "p50_us": 11,
+            "p95_us": 22.375,
+            "avg_us": 14.474579047619041
+          },
+          {
+            "p50_us": 12.041,
+            "p95_us": 24.709,
+            "avg_us": 14.65658071428572
+          },
+          {
+            "p50_us": 10.542,
+            "p95_us": 21.584,
+            "avg_us": 12.305020238095238
+          }
+        ]
+      }
+    }
+  ],
+  "wasmError": null
+}

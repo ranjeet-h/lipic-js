@@ -3893,6 +3893,22 @@ interface LongestMatchResult<TValue> {
 declare function buildTrie<TValue>(expandedMap: Record<string, TValue>): TrieNode<TValue>;
 declare function walkLongest<TValue>(root: TrieNode<TValue>, input: string, startIndex?: number): LongestMatchResult<TValue>;
 
+interface WasmTrieBindings {
+    walk_longest(input: string, startIndex: number): unknown;
+}
+interface WasmTrieModule {
+    WasmTrie: new (expandedMap: Record<string, unknown>) => WasmTrieBindings;
+    default?: () => Promise<unknown> | unknown;
+}
+interface WasmTrieFactoryOptions {
+    moduleLoader?: () => Promise<WasmTrieModule>;
+    fallbackToJs?: boolean;
+}
+interface TrieWalker<TValue> {
+    walkLongest(input: string, startIndex?: number): LongestMatchResult<TValue>;
+}
+declare function createWasmTrie<TValue>(expandedMap: Record<string, TValue>, options?: WasmTrieFactoryOptions): Promise<TrieWalker<TValue>>;
+
 interface InputStack {
     push(char: string): void;
     pop(): string | undefined;
@@ -3937,7 +3953,97 @@ interface TransliterationEngine {
     commit(): Edit$1;
     reset(): void;
 }
+type EngineRuntime = "js" | "wasm";
+interface RuntimeAwareTransliterationEngine extends TransliterationEngine {
+    getRuntime(): EngineRuntime;
+}
+declare function getEngineRuntime(engine: TransliterationEngine): EngineRuntime;
 declare function createTransliterationEngine(options: TransliterationEngineOptions): TransliterationEngine;
+
+type WasmMode = "auto" | boolean;
+interface HybridEngineFactoryOptions {
+    wasm?: WasmMode;
+    isWasm?: WasmMode;
+    preferWasm?: boolean;
+    fallbackToJs?: boolean;
+    moduleLoader?: () => Promise<unknown>;
+    scriptId?: string;
+    languageId?: string;
+    scriptBaseMap?: TransliterationEngineOptions["expandedMap"];
+    languageOverlayMap?: TransliterationEngineOptions["expandedMap"];
+    packCache?: Map<string, Uint8Array>;
+    packCacheKey?: string;
+}
+declare function createHybridTransliterationEngine(options: TransliterationEngineOptions, factoryOptions?: HybridEngineFactoryOptions): Promise<TransliterationEngine>;
+
+interface WasmEngineBindings {
+    process_char(ch: string): unknown;
+    process_text(text: string): unknown;
+    backspace(): unknown;
+    commit(): unknown;
+    reset(): void;
+}
+interface WasmEngineModule {
+    Engine: new (expandedMap: Record<string, unknown>, rules?: Record<string, unknown>) => WasmEngineBindings;
+    default?: () => Promise<unknown> | unknown;
+}
+interface WasmEngineFactoryOptions {
+    moduleLoader?: () => Promise<WasmEngineModule>;
+    fallbackToJs?: boolean;
+}
+declare function createWasmTransliterationEngine(options: TransliterationEngineOptions, factoryOptions?: WasmEngineFactoryOptions): Promise<TransliterationEngine>;
+
+interface WasmLanguagePackModule {
+    compile_language_pack(expandedMap: Record<string, unknown>, scriptId: string, languageId: string, rules?: Record<string, unknown>): Uint8Array | number[];
+    compile_script_base_pack(expandedMap: Record<string, unknown>, scriptId: string): Uint8Array | number[];
+    compile_language_overlay_pack(expandedMap: Record<string, unknown>, scriptId: string, languageId: string, rules?: Record<string, unknown>): Uint8Array | number[];
+    merge_language_packs(basePackBytes: Uint8Array, overlayPackBytes: Uint8Array): Uint8Array | number[];
+    inspect_language_pack(packBytes: Uint8Array): unknown;
+    Engine: {
+        fromLanguagePack(packBytes: Uint8Array): {
+            process_char(ch: string): unknown;
+            process_text(text: string): unknown;
+            backspace(): unknown;
+            commit(): unknown;
+            reset(): void;
+        };
+        fromLanguagePacks(basePackBytes: Uint8Array, overlayPackBytes: Uint8Array): {
+            process_char(ch: string): unknown;
+            process_text(text: string): unknown;
+            backspace(): unknown;
+            commit(): unknown;
+            reset(): void;
+        };
+    };
+    default?: () => Promise<unknown> | unknown;
+}
+interface LanguagePackSummary {
+    schema_version: number;
+    kind: "full" | "script_base" | "language_overlay";
+    script_id: string;
+    language_id: string;
+    entries: number;
+    has_rules: boolean;
+}
+interface WasmLanguagePackFactoryOptions {
+    moduleLoader?: () => Promise<WasmLanguagePackModule>;
+    fallbackToJs?: boolean;
+}
+declare function compileWasmLanguagePack(options: TransliterationEngineOptions & {
+    scriptId: string;
+    languageId: string;
+}, factoryOptions?: WasmLanguagePackFactoryOptions): Promise<Uint8Array>;
+declare function compileWasmScriptBasePack(options: {
+    expandedMap: Record<string, unknown>;
+    scriptId: string;
+}, factoryOptions?: WasmLanguagePackFactoryOptions): Promise<Uint8Array>;
+declare function compileWasmLanguageOverlayPack(options: TransliterationEngineOptions & {
+    scriptId: string;
+    languageId: string;
+}, factoryOptions?: WasmLanguagePackFactoryOptions): Promise<Uint8Array>;
+declare function inspectWasmLanguagePack(packBytes: Uint8Array, factoryOptions?: WasmLanguagePackFactoryOptions): Promise<LanguagePackSummary>;
+declare function createWasmEngineFromLanguagePack(packBytes: Uint8Array, fallbackOptions?: TransliterationEngineOptions, factoryOptions?: WasmLanguagePackFactoryOptions): Promise<TransliterationEngine>;
+declare function createWasmEngineFromLanguagePacks(basePackBytes: Uint8Array, overlayPackBytes: Uint8Array, fallbackOptions?: TransliterationEngineOptions, factoryOptions?: WasmLanguagePackFactoryOptions): Promise<TransliterationEngine>;
 
 type TextInputLike = HTMLInputElement | HTMLTextAreaElement;
 declare function deleteAndInsert(el: TextInputLike, backspace: number, insert: string): {
@@ -3971,6 +4077,40 @@ interface InputInterceptor {
     isAttached(): boolean;
 }
 declare function createInputInterceptor(options: InputInterceptorOptions): InputInterceptor;
+
+type LanguageCode = "hi" | "mr" | "ne" | "sa" | "bn" | "as" | "gu" | "pa" | "ta" | "te" | "kn" | "ml" | "or";
+type LanguageStatus = "available" | "planned";
+interface LanguageRegistryItem {
+    code: LanguageCode;
+    name: string;
+    script: string;
+    status: LanguageStatus;
+}
+declare function listLanguages(): LanguageRegistryItem[];
+declare function getLanguage(code: LanguageCode): LanguageRegistryItem;
+declare function isLanguageAvailable(code: LanguageCode): boolean;
+declare function resolveLanguageEngineConfig(code: LanguageCode): {
+    expandedMap: TransliterationEngineOptions["expandedMap"];
+    scriptId: string;
+    languageId: string;
+};
+
+interface EnableTransliterationOptions {
+    language: LanguageCode;
+    selector?: string;
+    elements?: Iterable<InterceptTarget>;
+    enabled?: boolean;
+    rules?: TransliterationEngineOptions["rules"];
+    engineFactoryOptions?: Omit<HybridEngineFactoryOptions, "scriptId" | "languageId" | "scriptBaseMap" | "languageOverlayMap">;
+    onEditApplied?: (edit: Edit$1) => void;
+    onBypass?: (reason: "disabled" | "modifier" | "composition" | "unsupported-target" | "selection") => void;
+}
+interface EnabledTransliteration {
+    language: LanguageCode;
+    attachedCount: number;
+    detach(): void;
+}
+declare function enableTransliteration(options: EnableTransliterationOptions): Promise<EnabledTransliteration>;
 
 interface ContentEditableEditResult {
     collapsed: boolean;
@@ -7119,4 +7259,4 @@ declare const maps: {
     };
 };
 
-export { type ContentEditableEditResult, DOMIntegrator, type Edit, type EngineRuleOptions, type InputInterceptor, type InputInterceptorOptions, type InputStack, type InterceptTarget, type LongestMatchResult, type NasalizationMode, type TextInputLike, type TransliterationEngine, type TransliterationEngineOptions, type TransliterationEntry, type TrieNode, buildTrie, createInputInterceptor, createInputStack, createTransliterationEngine, deleteAndInsert, deleteAndInsertContentEditable, base as devanagariBase, harvard_kyoto as devanagariHarvardKyoto, hunterian as devanagariHunterian, iast as devanagariIAST, iso15919 as devanagariISO15919, itrans as devanagariITRANS, slp1 as devanagariSLP1, velthuis as devanagariVelthuis, wx as devanagariWX, phonetic_base$1 as hindiPhoneticBase, phonetic_expanded$1 as hindiPhoneticExpanded, maps, phonetic_base as marathiPhoneticBase, phonetic_expanded as marathiPhoneticExpanded, walkLongest };
+export { type ContentEditableEditResult, DOMIntegrator, type Edit, type EnableTransliterationOptions, type EnabledTransliteration, type EngineRuleOptions, type EngineRuntime, type HybridEngineFactoryOptions, type InputInterceptor, type InputInterceptorOptions, type InputStack, type InterceptTarget, type LanguageCode, type LanguagePackSummary, type LanguageRegistryItem, type LongestMatchResult, type NasalizationMode, type RuntimeAwareTransliterationEngine, type TextInputLike, type TransliterationEngine, type TransliterationEngineOptions, type TransliterationEntry, type TrieNode, type TrieWalker, type WasmEngineFactoryOptions, type WasmLanguagePackFactoryOptions, type WasmTrieFactoryOptions, buildTrie, compileWasmLanguageOverlayPack, compileWasmLanguagePack, compileWasmScriptBasePack, createHybridTransliterationEngine, createInputInterceptor, createInputStack, createTransliterationEngine, createWasmEngineFromLanguagePack, createWasmEngineFromLanguagePacks, createWasmTransliterationEngine, createWasmTrie, deleteAndInsert, deleteAndInsertContentEditable, base as devanagariBase, harvard_kyoto as devanagariHarvardKyoto, hunterian as devanagariHunterian, iast as devanagariIAST, iso15919 as devanagariISO15919, itrans as devanagariITRANS, slp1 as devanagariSLP1, velthuis as devanagariVelthuis, wx as devanagariWX, enableTransliteration, getEngineRuntime, getLanguage, phonetic_base$1 as hindiPhoneticBase, phonetic_expanded$1 as hindiPhoneticExpanded, inspectWasmLanguagePack, isLanguageAvailable, listLanguages, maps, phonetic_base as marathiPhoneticBase, phonetic_expanded as marathiPhoneticExpanded, resolveLanguageEngineConfig, walkLongest };

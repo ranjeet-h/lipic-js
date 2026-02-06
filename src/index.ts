@@ -12,11 +12,30 @@ import hindiPhoneticExpanded from "../maps/hindi/phonetic.expanded.json";
 import marathiPhoneticBase from "../maps/marathi/phonetic.base.json";
 import marathiPhoneticExpanded from "../maps/marathi/phonetic.expanded.json";
 export { buildTrie, walkLongest } from "./engine/trie";
+export { createWasmTrie } from "./engine/wasm-trie";
 export { createInputStack } from "./engine/input-stack";
 export { createTransliterationEngine } from "./engine/transliteration-engine";
+export { getEngineRuntime } from "./engine/transliteration-engine";
+export { createHybridTransliterationEngine } from "./engine/hybrid-transliteration-engine";
+export { createWasmTransliterationEngine } from "./engine/wasm-transliteration-engine";
+export {
+  compileWasmLanguageOverlayPack,
+  compileWasmLanguagePack,
+  compileWasmScriptBasePack,
+  createWasmEngineFromLanguagePack,
+  createWasmEngineFromLanguagePacks,
+  inspectWasmLanguagePack
+} from "./engine/wasm-language-pack";
 export { deleteAndInsert, DOMIntegrator } from "./integrations/dom-integrator";
 export { createInputInterceptor } from "./integrations/input-interceptor";
+export { enableTransliteration } from "./integrations/enable-transliteration";
 export { deleteAndInsertContentEditable } from "./integrations/contenteditable-edit";
+export {
+  getLanguage,
+  isLanguageAvailable,
+  listLanguages,
+  resolveLanguageEngineConfig
+} from "./language/language-registry";
 export type { EngineRuleOptions, NasalizationMode } from "./engine/rules/types";
 export type { InputStack } from "./engine/input-stack";
 export type {
@@ -25,17 +44,34 @@ export type {
   InterceptTarget
 } from "./integrations/input-interceptor";
 export type {
+  EnableTransliterationOptions,
+  EnabledTransliteration
+} from "./integrations/enable-transliteration";
+export type {
+  LanguageCode,
+  LanguageRegistryItem
+} from "./language/language-registry";
+export type {
   ContentEditableEditResult
 } from "./integrations/contenteditable-edit";
 export type {
   LongestMatchResult,
   TrieNode
 } from "./engine/trie";
+export type { TrieWalker, WasmTrieFactoryOptions } from "./engine/wasm-trie";
+export type { HybridEngineFactoryOptions } from "./engine/hybrid-transliteration-engine";
 export type {
+  LanguagePackSummary,
+  WasmLanguagePackFactoryOptions
+} from "./engine/wasm-language-pack";
+export type {
+  EngineRuntime,
+  RuntimeAwareTransliterationEngine,
   TransliterationEngine,
   TransliterationEngineOptions,
   TransliterationEntry
 } from "./engine/transliteration-engine";
+export type { WasmEngineFactoryOptions } from "./engine/wasm-transliteration-engine";
 export type { TextInputLike } from "./integrations/dom-integrator";
 
 export type Edit = { backspace: number; insert: string };

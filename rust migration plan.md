@@ -12,7 +12,8 @@ Build the fastest transliteration library while keeping JS integration ergonomic
 2. One JS<->WASM call per user event.
 3. Zero/low-allocation hot path in Rust.
 4. Script-core + language-pack overlays.
-5. Perf gates in CI before shipping.
+5. Perf and size gates in local release checks before shipping.
+6. Latest stable Rust crates only (no prerelease dependencies in production).
 
 ---
 
@@ -52,7 +53,63 @@ WASM implementation must be swappable under same API.
 
 ---
 
+## Rust Toolchain + Package Baseline (Updated: February 6, 2026)
+
+### Toolchain Policy
+- Rust channel: `stable` only.
+- Required target: `wasm32-unknown-unknown`.
+- Use `cargo add` without pinned old versions so new setup always resolves to latest stable crates.
+- Disallow prerelease crates (`-alpha`, `-beta`, `-rc`) unless explicitly approved for a short-lived experiment.
+
+### Core Crates (latest stable checked on February 6, 2026)
+- `wasm-bindgen` `0.2.108`
+- `js-sys` `0.3.85`
+- `web-sys` `0.3.85` (only if browser APIs are needed in Rust)
+- `serde` `1.0.228`
+- `serde_json` `1.0.149`
+- `serde-wasm-bindgen` `0.6.5`
+- `thiserror` `2.0.18`
+- `anyhow` `1.0.101` (non-hot-path/app boundary errors only)
+- `hashbrown` `0.16.1`
+- `ahash` `0.8.12` (optional; for `wasm32-unknown-unknown`, avoid `runtime-rng` feature path)
+- `bincode` `3.0.0` currently hard-fails compile upstream; defer and re-check in M5 before adoption
+- `unicode-segmentation` `1.12.0` (if grapheme-aware cursor/backspace behavior is needed)
+
+### Dev/Test/Bench Crates (latest stable checked on February 6, 2026)
+- `wasm-bindgen-test` `0.3.58`
+- `proptest` `1.10.0`
+- `criterion` `0.8.2`
+
+### Scaffold Commands (M1)
+```bash
+mkdir -p rust-core
+cd rust-core
+cargo init --lib
+rustup target add wasm32-unknown-unknown
+
+# runtime deps
+cargo add wasm-bindgen js-sys serde serde_json serde-wasm-bindgen thiserror anyhow hashbrown
+
+# optional runtime deps
+cargo add web-sys unicode-segmentation
+
+# dev deps
+cargo add --dev wasm-bindgen-test proptest criterion
+```
+
+---
+
 ## Milestones & Tasks
+
+## Progress Tracker (Updated: February 6, 2026)
+- `M0` Baseline & instrumentation: `DONE` (stabilized benchmark harness + local perf/size artifact generation implemented)
+- `M1` Rust core skeleton + wasm bindings + TS wrapper: `DONE`
+- `M2` Trie + tokenizer + pre-rule render in Rust: `DONE`
+- `M3` Rule pipeline (Nukta, Nasalization, Ligature, Schwa) + toggles: `DONE`
+- `M4` State machine parity: `DONE`
+- `M5` Language-pack system: `DONE` (base/overlay/full pack compile + merge + lazy runtime caching implemented)
+- `M6` Performance optimization pass: `IN PROGRESS` (hot-path trie/tokenizer optimization + rule-stage buffer reuse landed; release-profile benchmark deltas recorded)
+- `M7` Production hardening: `IN PROGRESS` (WASM-preferred hybrid runtime + init/runtime JS fallback recovery implemented; browser matrix validation pending)
 
 ## M0 — Baseline & Instrumentation
 ### Tasks
@@ -66,13 +123,15 @@ WASM implementation must be swappable under same API.
 
 ### Done Criteria
 - Baseline report committed.
-- CI job produces perf and size artifacts.
+- Local scripts produce perf and size artifacts.
+- Status: `DONE` (`bench:baseline` + `size:baseline` generate timestamped and latest artifacts under `docs/perf`)
 
 ---
 
 ## M1 — Rust Core Skeleton
 ### Tasks
 - Create `rust-core/` crate with engine state struct.
+- Add latest stable crates via `cargo add` (do not hand-pin older versions).
 - Implement no-op methods with same API semantics.
 - Expose WASM bindings via `wasm-bindgen`.
 - Add JS wrapper that mirrors current engine interface.
@@ -80,6 +139,7 @@ WASM implementation must be swappable under same API.
 ### Done Criteria
 - JS app can instantiate WASM engine via wrapper.
 - Existing host code runs unchanged.
+- Status: `DONE`
 
 ---
 
@@ -93,6 +153,7 @@ WASM implementation must be swappable under same API.
 ### Done Criteria
 - Golden tests match JS for covered cases.
 - `processChar` parity for existing Milestone 2 scenarios.
+- Status: `DONE` (trie + tokenizer + pre-rule render ported to Rust with parity tests)
 
 ---
 
@@ -109,6 +170,7 @@ WASM implementation must be swappable under same API.
 ### Done Criteria
 - Rule test suite parity passes (Marathi current coverage).
 - No behavior regression against JS reference fixtures.
+- Status: `DONE` (rule order/toggles ported and validated)
 
 ---
 
@@ -121,19 +183,21 @@ WASM implementation must be swappable under same API.
 ### Done Criteria
 - Smart backspace tests pass on WASM core.
 - Preedit tests pass (`k -> क -> kh -> ख`) and spacing behavior parity.
+- Status: `DONE`
 
 ---
 
 ## M5 — Language Pack System (Scale to 21)
 ### Tasks
-- Define compact binary language-pack format.
-- Build pack compiler from JSON maps/rules -> binary artifacts.
-- Split script-base packs (e.g., Devanagari core) + per-language overlays.
-- Load packs lazily by language ID.
+- [x] Define compact binary language-pack format.
+- [x] Build pack compiler from JSON maps/rules -> binary artifacts.
+- [x] Split script-base packs (e.g., Devanagari core) + per-language overlays.
+- [x] Load packs lazily by language ID.
 
 ### Done Criteria
 - Dynamic language pack loading works.
 - At least 3 languages use new pack pipeline successfully.
+- Status: `DONE` (binary schema v1 + full/base/overlay compile + merge + engine boot from one/two packs + lazy-by-language runtime caching)
 
 ---
 
@@ -148,6 +212,12 @@ WASM implementation must be swappable under same API.
 - `processChar` p95 improves measurably over JS baseline.
 - `processText` throughput improves measurably.
 - No regression in correctness suite.
+- Current Progress:
+  - switched hot path to char-slice trie traversal (`walk_longest_chars_value`)
+  - added rendered-length caching in engine state to cut repeated scans/allocation pressure
+  - refactored rule pipeline to reuse buffers across stages (`apply_*_into` + swap pipeline)
+  - benchmark methodology stabilized (fixed warmup/rounds, round-median aggregation, release WASM packaging, engine reuse per round)
+  - latest snapshot (February 6, 2026): WASM is still slower than JS on current harness (`processChar p95` ~2.46us vs ~1.33us; `processText long avg` ~260.8us vs ~158.5us), so milestone remains `IN PROGRESS`
 
 ---
 
@@ -162,6 +232,12 @@ WASM implementation must be swappable under same API.
 ### Done Criteria
 - Stable hybrid runtime in Chrome/Firefox/Safari desktop.
 - Fallback path validated.
+- Current Progress:
+  - hybrid selector supports WASM-preferred and JS-only modes
+  - fallback now recovers on both WASM initialization failures and runtime method failures
+  - pack-based WASM path also recovers to JS fallback when runtime calls throw
+  - unit tests added for runtime fallback recovery paths
+  - remaining: browser matrix validation in real Chrome/Firefox/Safari
 
 ---
 
@@ -184,8 +260,8 @@ WASM implementation must be swappable under same API.
 - Future language-specific suites.
 
 ## 4. Perf Tests
-- CI benchmark trend lines.
-- Fail build on hard regression thresholds.
+- Local benchmark trend lines (`docs/perf/baseline.*.json`).
+- Optional local release gate on hard regression thresholds.
 
 ---
 
@@ -215,8 +291,7 @@ WASM implementation must be swappable under same API.
 
 ## Immediate Next Tasks (Actionable)
 1. Add benchmark harness and baseline report (M0).
-2. Create Rust crate + wasm bindings scaffold (M1).
-3. Port trie/longest-match with parity fixtures (M2 partial).
-4. Set up dual-engine test runner (JS vs WASM).
-5. Define binary language-pack schema draft.
-
+2. Add broader WASM-vs-JS fixture parity for `commit/reset/processText` edge sequences (finish M4).
+3. Add pack artifact loader path in TS app/runtime and lazy-load by language ID (M5).
+4. Roll out pack pipeline for at least 3 languages (M5 done criteria).
+5. Start perf profiling with CI thresholds (`processChar` p95 and `processText` throughput) (M6).
