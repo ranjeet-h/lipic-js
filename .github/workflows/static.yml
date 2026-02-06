@@ -33,10 +33,13 @@ jobs:
 
       - name: Prepare deploy directory
         run: |
-          mkdir -p _site/playground _site/dist
+          mkdir -p _site/playground _site/dist _site/wasm _site/rust-core/pkg
           cp -r playground/* _site/playground/
           cp -r dist/* _site/dist/
+          cp -r dist/wasm/* _site/wasm/
+          cp -r dist/wasm/* _site/rust-core/pkg/
           echo '<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0;url=playground/"></head></html>' > _site/index.html
+          touch _site/.nojekyll
 
       - name: Verify deploy directory
         run: |
