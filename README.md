@@ -47,7 +47,7 @@ import { enableTransliteration } from "lipic-js";
 
 const session = await enableTransliteration({
   language: "hi",
-  isWasm: "auto"
+  engineFactoryOptions: { isWasm: "auto" }
 });
 ```
 
@@ -59,7 +59,7 @@ const session = await enableTransliteration({
   (async () => {
     const session = await window.LipicJS.enableTransliteration({
       language: "hi",
-      isWasm: "auto"
+      engineFactoryOptions: { isWasm: "auto" }
     });
     window._lipicSession = session;
   })();
@@ -74,7 +74,7 @@ After `npm run build:all`, copy `dist/` to your server.
   import { enableTransliteration } from "/assets/lipic-js/index.js";
   const session = await enableTransliteration({
     language: "hi",
-    isWasm: "auto"
+    engineFactoryOptions: { isWasm: "auto" }
   });
 </script>
 ```
