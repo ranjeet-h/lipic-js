@@ -1,0 +1,47 @@
+{
+  "name": "indic-ime",
+  "version": "0.1.0",
+  "description": "Indic IME building blocks (data-first)",
+  "license": "MIT",
+  "type": "module",
+  "files": [
+    "dist/",
+    "maps/",
+    "tools/",
+    "LICENSE",
+    "CLEAN_ROOM.md"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./maps/devanagari/base": {
+      "default": "./maps/devanagari/base.json"
+    },
+    "./maps/marathi/phonetic.base": {
+      "default": "./maps/marathi/phonetic.base.json"
+    },
+    "./maps/marathi/phonetic.expanded": {
+      "default": "./maps/marathi/phonetic.expanded.json"
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "unpkg": "./dist/indic-ime.iife.js",
+  "jsdelivr": "./dist/indic-ime.iife.js",
+  "scripts": {
+    "build": "tsup",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "generate-map": "node tools/generate-map.js",
+    "print-inventory": "node tools/print-inventory.js"
+  },
+  "devDependencies": {
+    "tsup": "8.5.0",
+    "typescript": "5.8.2"
+  }
+}
+
