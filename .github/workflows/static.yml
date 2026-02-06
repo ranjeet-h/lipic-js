@@ -31,13 +31,27 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Prepare deploy directory
+        run: |
+          mkdir -p _site/playground _site/dist
+          cp -r playground/* _site/playground/
+          cp -r dist/* _site/dist/
+          echo '<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0;url=playground/"></head></html>' > _site/index.html
+
+      - name: Verify deploy directory
+        run: |
+          echo "=== _site structure ==="
+          find _site -type f
+          echo "=== root index.html ==="
+          cat _site/index.html
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: .
+          path: ./_site
 
       - name: Deploy to GitHub Pages
         id: deployment
