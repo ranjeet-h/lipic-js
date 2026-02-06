@@ -30,24 +30,30 @@ jobs:
 
       - name: Preserve wasm files and build
         run: |
-          cp -r dist/wasm /tmp/wasm-backup
+          mkdir /tmp/wasm-backup
+          cp dist/wasm/* /tmp/wasm-backup/
           npm run build
-          cp -r /tmp/wasm-backup dist/wasm
+          mkdir -p dist/wasm
+          cp /tmp/wasm-backup/* dist/wasm/
 
       - name: Prepare deploy directory
         run: |
-          mkdir -p _site/playground _site/dist
+          mkdir -p _site/playground _site/dist/wasm _site/wasm _site/rust-core/pkg
           cp -r playground/* _site/playground/
           cp -r dist/* _site/dist/
+          cp dist/wasm/* _site/wasm/
+          cp dist/wasm/* _site/rust-core/pkg/
           echo '<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0;url=playground/"></head></html>' > _site/index.html
           touch _site/.nojekyll
 
       - name: Verify deploy directory
         run: |
-          echo "=== _site structure ==="
-          find _site -type f
-          echo "=== root index.html ==="
-          cat _site/index.html
+          echo "=== All files in _site ==="
+          find _site -type f | sort
+          echo "=== Check wasm files ==="
+          ls -la _site/dist/wasm/ || echo "NO dist/wasm"
+          ls -la _site/wasm/ || echo "NO wasm"
+          ls -la _site/rust-core/pkg/ || echo "NO rust-core/pkg"
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
