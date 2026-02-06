@@ -1,25 +1,39 @@
+<div align="center">
+
 # lipic-js
 
-[![npm version](https://badge.fury.io/js/%40ranjeet-h%Flipic-js.svg)](https://badge.fury.io/js/%40ranjeet-h%Flipic-js)
+Fast transliteration for web text inputs (`input`, `textarea`, `contenteditable`) with a JS/WASM hybrid runtime.
+
+[![npm](https://img.shields.io/npm/v/%40ranjeet-h%2Flipic-js?label=npm)](https://www.npmjs.com/package/@ranjeet-h/lipic-js)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.8+-blue.svg)](https://www.typescriptlang.org/)
-[![Playground](https://img.shields.io/badge/Playground-Online-green.svg)](https://ranjeet-h.github.io/lipic-js/playground/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.8+-3178c6.svg)](https://www.typescriptlang.org/)
+[![Playground](https://img.shields.io/badge/Playground-Live-22c55e.svg)](https://ranjeet-h.github.io/lipic-js/playground/)
 
-> 🚀 **High-performance transliteration library for web text inputs** with JavaScript/WebAssembly hybrid runtime
+[Playground](https://ranjeet-h.github.io/lipic-js/playground/) • [Issues](https://github.com/ranjeet-h/lipic-js/issues) • [Discussions](https://github.com/ranjeet-h/lipic-js/discussions)
 
-A lightweight, blazing-fast transliteration engine that seamlessly integrates with web forms, supporting multiple Indian languages and scripts. Built with performance and flexibility in mind.
+</div>
 
-## ✨ Features
+## Table of Contents
 
-- **🎯 Easy Integration**: Works with `input`, `textarea`, and `contenteditable` elements
-- **⚡ High Performance**: Hybrid JavaScript/WebAssembly runtime for optimal speed
-- **🌍 Multi-Language Support**: 13+ Indian languages across major scripts
-- **📦 Multiple Installation Options**: npm, CDN, or self-hosted
-- **🔧 Flexible Configuration**: Fine-tune engine behavior and WASM usage
-- **🛡️ Type Safety**: Full TypeScript support with comprehensive definitions
-- **📱 Lightweight**: Minimal bundle size with optional WASM acceleration
+- [Features](#features)
+- [Quick Start](#quick-start)
+- [Supported Languages](#supported-languages)
+- [Usage Options](#usage-options)
+- [Configuration](#configuration)
+- [Build Options](#build-options)
+- [Development](#development)
+- [Contributing](#contributing)
+- [License](#license)
 
-## 🚀 Quick Start
+## Features
+
+- **Easy integration**: Works with `input`, `textarea`, and `contenteditable` elements
+- **High performance**: Hybrid JavaScript/WebAssembly runtime
+- **Multi-language support**: 13+ Indian languages across major scripts
+- **Flexible installation**: npm, CDN, or self-hosted
+- **Type-safe**: First-class TypeScript support
+
+## Quick Start
 
 ### Installation
 
@@ -42,7 +56,7 @@ const session = await enableTransliteration({
 session.detach();
 ```
 
-## 📋 Supported Languages
+## Supported Languages
 | Script | Languages |
 |--------|-----------|
 | Devanagari | `hi` (Hindi), `mr` (Marathi), `ne` (Nepali), `sa` (Sanskrit) |
@@ -55,11 +69,11 @@ session.detach();
 | Malayalam | `ml` (Malayalam) |
 | Odia | `or` (Odia) |
 
-### ✅ Implementation Status
+### Implementation Status
 
 **Currently Available**: `hi`, `mr`, `ne`, `sa`, `bn`, `as`, `gu`, `pa`, `ta`, `te`, `kn`, `ml`, `or`
 
-## 📦 Usage Options
+## Usage Options
 
 ### 1. npm Package
 
@@ -111,87 +125,85 @@ After `npm run build:all`, copy `dist/` to your server:
 - `/assets/lipic-js/wasm/rust_core.js`
 - `/assets/lipic-js/wasm/rust_core_bg.wasm`
 
-## ⚙️ Configuration
+## Configuration
 
-### WebAssembly Control
+<details>
+<summary><strong>WebAssembly control</strong></summary>
 
 `createHybridTransliterationEngine` and `enableTransliteration` support:
 
-- **`isWasm: "auto"`** (default): JavaScript for keystroke operations, WebAssembly for batch processing when available
-- **`isWasm: true`**: Prefer WebAssembly strongly (safely falls back to JS if WASM files are missing)
-- **`isWasm: false`**: Force JavaScript engine only
+- **`isWasm: "auto"`** (default): Use JS for keystrokes and WASM for batch processing when available
+- **`isWasm: true`**: Prefer WASM strongly (falls back to JS if WASM files are missing)
+- **`isWasm: false`**: Force JS
 
-### Fail-Safe Mechanism
+If `dist/wasm` files are not present, the library continues with the JavaScript engine without breaking.
 
-If `dist/wasm` files are not present, the library automatically continues with the JavaScript engine without breaking functionality.
+</details>
 
-## 🔧 Build Options
+## Build Options
 
-### JavaScript-Only Build (Default)
+<details>
+<summary><strong>JavaScript-only build (default)</strong></summary>
 
 ```bash
 npm run build:js-only
 ```
 
-Produces lightweight JavaScript bundles for standard distribution.
+</details>
 
-### Full Build with WebAssembly
+<details>
+<summary><strong>Build with WebAssembly</strong></summary>
 
 ```bash
 npm run build:with-wasm
 ```
 
-Includes both JavaScript and WebAssembly artifacts for maximum performance.
+Artifacts:
 
-**Build Artifacts:**
-- `dist/` - Main distribution files
-- `dist/wasm/rust_core.js` - WebAssembly JavaScript bindings
-- `dist/wasm/rust_core_bg.wasm` - WebAssembly binary
+- `dist/`
+- `dist/wasm/rust_core.js`
+- `dist/wasm/rust_core_bg.wasm`
 
-## 🛠️ Development
+</details>
 
-### Prerequisites
+## Development
+
+<details>
+<summary><strong>Prerequisites</strong></summary>
 
 - Node.js 18+
-- Rust (for WebAssembly builds, optional)
+- Rust (optional, only for WebAssembly builds)
 
-### Scripts
+</details>
+
+<details>
+<summary><strong>Scripts</strong></summary>
 
 ```bash
-# Development
-npm run build              # Build JavaScript only
-npm run build:with-wasm    # Build with WebAssembly
-npm run test               # Run tests
-npm run typecheck          # Type checking
+npm run build
+npm run build:with-wasm
+npm run test
+npm run typecheck
 
-# Language Maps
-npm run generate-map:all-languages  # Regenerate all language maps
-
-# Performance
-npm run bench:baseline      # Performance benchmarks
-npm run size:baseline       # Bundle size analysis
+npm run generate-map:all-languages
 ```
 
-### Language Map Generation
+</details>
 
-The library uses transliteration mapping tables from:
+<details>
+<summary><strong>Language map generation</strong></summary>
+
+Mapping tables are derived from:
 
 - [`@indic-transliteration/common_maps`](https://github.com/indic-transliteration/common_maps/tree/master)
-
-To regenerate all language maps:
 
 ```bash
 npm run generate-map:all-languages
 ```
 
-## 📊 Performance
+</details>
 
-- **JavaScript Engine**: Optimized for real-time keystroke processing
-- **WebAssembly Engine**: High-performance batch text processing
-- **Hybrid Mode**: Best of both worlds - responsive UI with fast bulk operations
-- **Bundle Size**: < 50KB (JavaScript only), ~200KB (with WebAssembly)
-
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.
 
@@ -205,17 +217,17 @@ npm run build
 npm test
 ```
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - [`@indic-transliteration/common_maps`](https://github.com/indic-transliteration/common_maps) for comprehensive transliteration mappings
 - The WebAssembly team for the amazing performance capabilities
 - All contributors and users of this library
 
-## 📞 Support
+## Support
 
 - 📖 [Documentation](https://github.com/ranjeet-h/lipic-js)
 - 🎮 [Live Playground](https://ranjeet-h.github.io/lipic-js/playground/)
