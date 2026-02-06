@@ -1,4 +1,14 @@
 import devanagariBase from "../maps/devanagari/base.json";
+import devanagariHunterian from "../maps/devanagari/schemes/hunterian.json";
+import devanagariHarvardKyoto from "../maps/devanagari/schemes/harvard_kyoto.json";
+import devanagariIAST from "../maps/devanagari/schemes/iast.json";
+import devanagariISO15919 from "../maps/devanagari/schemes/iso15919.json";
+import devanagariITRANS from "../maps/devanagari/schemes/itrans.json";
+import devanagariSLP1 from "../maps/devanagari/schemes/slp1.json";
+import devanagariVelthuis from "../maps/devanagari/schemes/velthuis.json";
+import devanagariWX from "../maps/devanagari/schemes/wx.json";
+import hindiPhoneticBase from "../maps/hindi/phonetic.base.json";
+import hindiPhoneticExpanded from "../maps/hindi/phonetic.expanded.json";
 import marathiPhoneticBase from "../maps/marathi/phonetic.base.json";
 import marathiPhoneticExpanded from "../maps/marathi/phonetic.expanded.json";
 export { buildTrie, walkLongest } from "./engine/trie";
@@ -32,7 +42,23 @@ export type Edit = { backspace: number; insert: string };
 
 export const maps = {
   devanagari: {
-    base: devanagariBase
+    base: devanagariBase,
+    schemes: {
+      iast: devanagariIAST,
+      iso15919: devanagariISO15919,
+      harvardKyoto: devanagariHarvardKyoto,
+      itrans: devanagariITRANS,
+      velthuis: devanagariVelthuis,
+      slp1: devanagariSLP1,
+      wx: devanagariWX,
+      hunterian: devanagariHunterian
+    }
+  },
+  hindi: {
+    phonetic: {
+      base: hindiPhoneticBase,
+      expanded: hindiPhoneticExpanded
+    }
   },
   marathi: {
     phonetic: {
@@ -42,4 +68,18 @@ export const maps = {
   }
 } as const;
 
-export { devanagariBase, marathiPhoneticBase, marathiPhoneticExpanded };
+export {
+  devanagariBase,
+  devanagariHunterian,
+  devanagariHarvardKyoto,
+  devanagariIAST,
+  devanagariISO15919,
+  devanagariITRANS,
+  devanagariSLP1,
+  devanagariVelthuis,
+  devanagariWX,
+  hindiPhoneticBase,
+  hindiPhoneticExpanded,
+  marathiPhoneticBase,
+  marathiPhoneticExpanded
+};

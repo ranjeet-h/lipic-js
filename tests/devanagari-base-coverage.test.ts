@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import devanagariBase from "../maps/devanagari/base.json";
+import hindiExpanded from "../maps/hindi/phonetic.expanded.json";
 import marathiExpanded from "../maps/marathi/phonetic.expanded.json";
 
 function asSet(values: string[]): Set<string> {
@@ -38,6 +39,21 @@ describe("devanagari base coverage for language packs", () => {
   it("keeps Marathi expanded map glyphs in Devanagari block", () => {
     const glyphs: string[] = [];
     for (const entry of Object.values(marathiExpanded)) {
+      if (typeof entry.glyph === "string") glyphs.push(entry.glyph);
+      if (typeof entry.matra === "string" && entry.matra.length > 0) glyphs.push(entry.matra);
+    }
+
+    for (const glyph of glyphs) {
+      for (const ch of glyph) {
+        const cp = ch.codePointAt(0) ?? 0;
+        expect(cp >= 0x0900 && cp <= 0x097f).toBe(true);
+      }
+    }
+  });
+
+  it("keeps Hindi expanded map glyphs in Devanagari block", () => {
+    const glyphs: string[] = [];
+    for (const entry of Object.values(hindiExpanded)) {
       if (typeof entry.glyph === "string") glyphs.push(entry.glyph);
       if (typeof entry.matra === "string" && entry.matra.length > 0) glyphs.push(entry.matra);
     }

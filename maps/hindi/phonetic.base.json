@@ -1,0 +1,57 @@
+{
+  "a": { "type": "vowel", "glyph": "अ", "matra": "" },
+  "aa": { "type": "vowel", "glyph": "आ", "matra": "ा" },
+  "i": { "type": "vowel", "glyph": "इ", "matra": "ि" },
+  "ii": { "type": "vowel", "glyph": "ई", "matra": "ी" },
+  "u": { "type": "vowel", "glyph": "उ", "matra": "ु" },
+  "uu": { "type": "vowel", "glyph": "ऊ", "matra": "ू" },
+  "ri": { "type": "vowel", "glyph": "ऋ", "matra": "ृ" },
+  "e": { "type": "vowel", "glyph": "ए", "matra": "े" },
+  "ai": { "type": "vowel", "glyph": "ऐ", "matra": "ै" },
+  "o": { "type": "vowel", "glyph": "ओ", "matra": "ो" },
+  "au": { "type": "vowel", "glyph": "औ", "matra": "ौ" },
+
+  "k": { "type": "consonant", "glyph": "क" },
+  "kh": { "type": "consonant", "glyph": "ख" },
+  "g": { "type": "consonant", "glyph": "ग" },
+  "gh": { "type": "consonant", "glyph": "घ" },
+  "ng": { "type": "consonant", "glyph": "ङ" },
+
+  "ch": { "type": "consonant", "glyph": "च" },
+  "chh": { "type": "consonant", "glyph": "छ" },
+  "j": { "type": "consonant", "glyph": "ज" },
+  "jh": { "type": "consonant", "glyph": "झ" },
+  "ny": { "type": "consonant", "glyph": "ञ" },
+
+  "T": { "type": "consonant", "glyph": "ट" },
+  "Th": { "type": "consonant", "glyph": "ठ" },
+  "D": { "type": "consonant", "glyph": "ड" },
+  "Dh": { "type": "consonant", "glyph": "ढ" },
+  "N": { "type": "consonant", "glyph": "ण" },
+
+  "t": { "type": "consonant", "glyph": "त" },
+  "th": { "type": "consonant", "glyph": "थ" },
+  "d": { "type": "consonant", "glyph": "द" },
+  "dh": { "type": "consonant", "glyph": "ध" },
+  "n": { "type": "consonant", "glyph": "न" },
+
+  "p": { "type": "consonant", "glyph": "प" },
+  "ph": { "type": "consonant", "glyph": "फ" },
+  "b": { "type": "consonant", "glyph": "ब" },
+  "bh": { "type": "consonant", "glyph": "भ" },
+  "m": { "type": "consonant", "glyph": "म" },
+
+  "y": { "type": "consonant", "glyph": "य" },
+  "r": { "type": "consonant", "glyph": "र" },
+  "l": { "type": "consonant", "glyph": "ल" },
+  "v": { "type": "consonant", "glyph": "व" },
+
+  "sh": { "type": "consonant", "glyph": "श" },
+  "Sh": { "type": "consonant", "glyph": "ष" },
+  "s": { "type": "consonant", "glyph": "स" },
+  "h": { "type": "consonant", "glyph": "ह" },
+
+  "M": { "type": "mark", "glyph": "ं" },
+  "MM": { "type": "mark", "glyph": "ँ" },
+  "H": { "type": "mark", "glyph": "ः" }
+}

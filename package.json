@@ -20,6 +20,36 @@
     "./maps/devanagari/base": {
       "default": "./maps/devanagari/base.json"
     },
+    "./maps/devanagari/schemes/iast": {
+      "default": "./maps/devanagari/schemes/iast.json"
+    },
+    "./maps/devanagari/schemes/iso15919": {
+      "default": "./maps/devanagari/schemes/iso15919.json"
+    },
+    "./maps/devanagari/schemes/harvard_kyoto": {
+      "default": "./maps/devanagari/schemes/harvard_kyoto.json"
+    },
+    "./maps/devanagari/schemes/itrans": {
+      "default": "./maps/devanagari/schemes/itrans.json"
+    },
+    "./maps/devanagari/schemes/velthuis": {
+      "default": "./maps/devanagari/schemes/velthuis.json"
+    },
+    "./maps/devanagari/schemes/slp1": {
+      "default": "./maps/devanagari/schemes/slp1.json"
+    },
+    "./maps/devanagari/schemes/wx": {
+      "default": "./maps/devanagari/schemes/wx.json"
+    },
+    "./maps/devanagari/schemes/hunterian": {
+      "default": "./maps/devanagari/schemes/hunterian.json"
+    },
+    "./maps/hindi/phonetic.base": {
+      "default": "./maps/hindi/phonetic.base.json"
+    },
+    "./maps/hindi/phonetic.expanded": {
+      "default": "./maps/hindi/phonetic.expanded.json"
+    },
     "./maps/marathi/phonetic.base": {
       "default": "./maps/marathi/phonetic.base.json"
     },

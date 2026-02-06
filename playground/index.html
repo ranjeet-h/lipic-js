@@ -16,10 +16,12 @@
     <h1>Indic IME Playground</h1>
 
     <label>
-      Language (UI-only)
+      Language
       <select id="language">
-        <option value="marathi" selected>Marathi (phonetic)</option>
-        <option value="hindi">Hindi (placeholder)</option>
+        <option value="hindi" selected>Hindi (Devanagari)</option>
+        <option value="marathi">Marathi (Devanagari)</option>
+        <option value="nepali">Nepali (Devanagari)</option>
+        <option value="sanskrit">Sanskrit (Devanagari)</option>
       </select>
     </label>
 
@@ -38,7 +40,7 @@
       <div id="ce" contenteditable="true" role="textbox" aria-multiline="true"></div>
     </label>
 
-    <p><small>Language selector is UI-only in this milestone.</small></p>
+    <p><small id="lang-note"></small></p>
 
     <script type="module" src="./main.js"></script>
   </body>
