@@ -242,9 +242,6 @@ async function main() {
   fs.mkdirSync(path.dirname(outPath), { recursive: true });
   fs.writeFileSync(outPath, `${JSON.stringify(payload, null, 2)}\n`, "utf8");
 
-  const timestampFile = path.resolve(process.cwd(), `docs/perf/baseline.${Date.now()}.json`);
-  fs.writeFileSync(timestampFile, `${JSON.stringify(payload, null, 2)}\n`, "utf8");
-
   console.log(`Wrote benchmark baseline: ${outPath}`);
   if (wasmError) {
     console.warn(`WASM suite unavailable: ${wasmError}`);
