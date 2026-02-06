@@ -33,9 +33,10 @@ jobs:
 
       - name: Prepare deploy directory
         run: |
-          mkdir -p _site/dist
-          cp -r playground/* _site/
+          mkdir -p _site/playground _site/dist
+          cp -r playground/* _site/playground/
           cp -r dist/* _site/dist/
+          cp _site/playground/index.html _site/index.html
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
