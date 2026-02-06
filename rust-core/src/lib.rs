@@ -7,9 +7,6 @@ use std::collections::HashMap as StdHashMap;
 use trie::TrieNode;
 use wasm_bindgen::prelude::*;
 
-const HALANT: &str = "्";
-const ANUSVARA: &str = "ं";
-
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
 pub(crate) struct TransliterationEntry {
     #[serde(rename = "type")]
@@ -78,6 +75,151 @@ impl RuleOptions {
     }
 }
 
+#[derive(Clone, Debug)]
+struct ScriptRuleConfig {
+    script_id: &'static str,
+    is_devanagari: bool,
+    halant: &'static str,
+    anusvara: &'static str,
+    nukta: &'static str,
+}
+
+impl ScriptRuleConfig {
+    fn from_script_id(script_id: &str) -> Self {
+        match script_id {
+            "devanagari" => Self {
+                script_id: "devanagari",
+                is_devanagari: true,
+                halant: "्",
+                anusvara: "ं",
+                nukta: "़",
+            },
+            "bengali" => Self {
+                script_id: "bengali",
+                is_devanagari: false,
+                halant: "্",
+                anusvara: "ং",
+                nukta: "়",
+            },
+            "gurmukhi" => Self {
+                script_id: "gurmukhi",
+                is_devanagari: false,
+                halant: "੍",
+                anusvara: "ਂ",
+                nukta: "਼",
+            },
+            "gujarati" => Self {
+                script_id: "gujarati",
+                is_devanagari: false,
+                halant: "્",
+                anusvara: "ં",
+                nukta: "઼",
+            },
+            "odia" => Self {
+                script_id: "odia",
+                is_devanagari: false,
+                halant: "୍",
+                anusvara: "ଂ",
+                nukta: "଼",
+            },
+            "tamil" => Self {
+                script_id: "tamil",
+                is_devanagari: false,
+                halant: "்",
+                anusvara: "ஂ",
+                nukta: "",
+            },
+            "telugu" => Self {
+                script_id: "telugu",
+                is_devanagari: false,
+                halant: "్",
+                anusvara: "ం",
+                nukta: "",
+            },
+            "kannada" => Self {
+                script_id: "kannada",
+                is_devanagari: false,
+                halant: "್",
+                anusvara: "ಂ",
+                nukta: "಼",
+            },
+            "malayalam" => Self {
+                script_id: "malayalam",
+                is_devanagari: false,
+                halant: "്",
+                anusvara: "ം",
+                nukta: "",
+            },
+            _ => Self {
+                script_id: "unknown",
+                is_devanagari: false,
+                halant: "्",
+                anusvara: "ं",
+                nukta: "",
+            },
+        }
+    }
+}
+
+fn detect_script_id_from_char(ch: char) -> Option<&'static str> {
+    let cp = ch as u32;
+    if (0x0900..=0x097F).contains(&cp) {
+        return Some("devanagari");
+    }
+    if (0x0980..=0x09FF).contains(&cp) {
+        return Some("bengali");
+    }
+    if (0x0A00..=0x0A7F).contains(&cp) {
+        return Some("gurmukhi");
+    }
+    if (0x0A80..=0x0AFF).contains(&cp) {
+        return Some("gujarati");
+    }
+    if (0x0B00..=0x0B7F).contains(&cp) {
+        return Some("odia");
+    }
+    if (0x0B80..=0x0BFF).contains(&cp) {
+        return Some("tamil");
+    }
+    if (0x0C00..=0x0C7F).contains(&cp) {
+        return Some("telugu");
+    }
+    if (0x0C80..=0x0CFF).contains(&cp) {
+        return Some("kannada");
+    }
+    if (0x0D00..=0x0D7F).contains(&cp) {
+        return Some("malayalam");
+    }
+    None
+}
+
+fn infer_script_rules_from_map(map: &HashMap<String, TransliterationEntry>) -> ScriptRuleConfig {
+    for entry in map.values() {
+        if entry.entry_type != "consonant"
+            && entry.entry_type != "conjunct"
+            && entry.entry_type != "vowel"
+        {
+            continue;
+        }
+
+        for ch in entry.glyph.chars() {
+            if let Some(script_id) = detect_script_id_from_char(ch) {
+                return ScriptRuleConfig::from_script_id(script_id);
+            }
+        }
+
+        if let Some(matra) = &entry.matra {
+            for ch in matra.chars() {
+                if let Some(script_id) = detect_script_id_from_char(ch) {
+                    return ScriptRuleConfig::from_script_id(script_id);
+                }
+            }
+        }
+    }
+
+    ScriptRuleConfig::from_script_id("unknown")
+}
+
 #[derive(Serialize)]
 struct Edit {
     backspace: usize,
@@ -120,6 +262,8 @@ pub struct Engine {
     rendered_len: usize,
     trie: TrieNode<TransliterationEntry>,
     rule_options: RuleOptions,
+    script_rules: ScriptRuleConfig,
+    language_id: Option<String>,
 }
 
 #[wasm_bindgen]
@@ -134,6 +278,7 @@ impl Engine {
         let map: StdHashMap<String, TransliterationEntry> =
             serde_wasm_bindgen::from_value(expanded_map).map_err(to_js_error)?;
         let map: HashMap<String, TransliterationEntry> = map.into_iter().collect();
+        let script_rules = infer_script_rules_from_map(&map);
 
         Ok(Self {
             input_buffer: String::new(),
@@ -141,6 +286,8 @@ impl Engine {
             rendered_len: 0,
             trie: trie::build_trie(&map),
             rule_options: RuleOptions::from_js_value(rules)?,
+            script_rules,
+            language_id: None,
         })
     }
 
@@ -174,7 +321,13 @@ impl Engine {
             if is_separator_chunk(&chunk) {
                 out.push_str(&chunk);
             } else {
-                out.push_str(&compute_rendered(&chunk, &self.trie, &self.rule_options));
+                out.push_str(&compute_rendered(
+                    &chunk,
+                    &self.trie,
+                    &self.rule_options,
+                    &self.script_rules,
+                    self.language_id.as_deref(),
+                ));
             }
         }
 
@@ -226,12 +379,16 @@ impl Engine {
         let decoded = language_pack::decode_pack(pack_bytes).map_err(to_js_error)?;
         let pack_map: HashMap<String, TransliterationEntry> =
             decoded.body.expanded_map.into_iter().collect();
+        let script_rules = ScriptRuleConfig::from_script_id(&decoded.header.script_id);
+        let language_id = Some(decoded.header.language_id);
         Ok(Self {
             input_buffer: String::new(),
             rendered_buffer: String::new(),
             rendered_len: 0,
             trie: trie::build_trie(&pack_map),
             rule_options: RuleOptions::from_input(decoded.body.rules),
+            script_rules,
+            language_id,
         })
     }
 
@@ -244,12 +401,16 @@ impl Engine {
             .map_err(to_js_error)?;
         let pack_map: HashMap<String, TransliterationEntry> =
             merged.body.expanded_map.into_iter().collect();
+        let script_rules = ScriptRuleConfig::from_script_id(&merged.header.script_id);
+        let language_id = Some(merged.header.language_id);
         Ok(Self {
             input_buffer: String::new(),
             rendered_buffer: String::new(),
             rendered_len: 0,
             trie: trie::build_trie(&pack_map),
             rule_options: RuleOptions::from_input(merged.body.rules),
+            script_rules,
+            language_id,
         })
     }
 }
@@ -281,7 +442,13 @@ impl WasmTrie {
 
 impl Engine {
     fn rewrite_from_current_input(&mut self) -> Result<JsValue, JsValue> {
-        let next_rendered = compute_rendered(&self.input_buffer, &self.trie, &self.rule_options);
+        let next_rendered = compute_rendered(
+            &self.input_buffer,
+            &self.trie,
+            &self.rule_options,
+            &self.script_rules,
+            self.language_id.as_deref(),
+        );
         let edit = Edit {
             backspace: self.rendered_len,
             insert: next_rendered.clone(),
@@ -380,7 +547,7 @@ fn is_consonant_token(token: &Token) -> bool {
     matches!(token, Token::Consonant(_))
 }
 
-fn insert_halants(tokens: &[Token]) -> Vec<Token> {
+fn insert_halants(tokens: &[Token], halant: &str) -> Vec<Token> {
     let mut out = Vec::with_capacity(tokens.len().saturating_mul(2));
 
     for i in 0..tokens.len() {
@@ -393,7 +560,7 @@ fn insert_halants(tokens: &[Token]) -> Vec<Token> {
         }
 
         if next.is_some_and(is_consonant_token) {
-            out.push(Token::Halant(HALANT.to_owned()));
+            out.push(Token::Halant(halant.to_owned()));
         }
     }
 
@@ -407,7 +574,11 @@ fn is_ng_split_vowel(ch: char) -> bool {
     )
 }
 
-fn tokenize_buffer(buffer: &str, trie: &TrieNode<TransliterationEntry>) -> Vec<Token> {
+fn tokenize_buffer(
+    buffer: &str,
+    trie: &TrieNode<TransliterationEntry>,
+    script_rules: &ScriptRuleConfig,
+) -> Vec<Token> {
     let mut raw_tokens = Vec::with_capacity(buffer.len().saturating_mul(2));
     let mut index = 0usize;
     let total_chars = buffer.chars().count();
@@ -456,7 +627,7 @@ fn tokenize_buffer(buffer: &str, trie: &TrieNode<TransliterationEntry>) -> Vec<T
         }
     }
 
-    insert_halants(&raw_tokens)
+    insert_halants(&raw_tokens, script_rules.halant)
 }
 
 fn is_raw(token: Option<&Token>, text: &str) -> bool {
@@ -484,7 +655,13 @@ fn push_with_optional_akar(
     false
 }
 
-fn apply_nukta_rule_into(tokens: &[Token], out: &mut Vec<Token>) {
+fn apply_nukta_rule_into(tokens: &[Token], script_rules: &ScriptRuleConfig, out: &mut Vec<Token>) {
+    if !script_rules.is_devanagari {
+        out.clear();
+        out.extend(tokens.iter().cloned());
+        return;
+    }
+
     out.clear();
     out.reserve(tokens.len());
     let mut i = 0usize;
@@ -503,6 +680,27 @@ fn apply_nukta_rule_into(tokens: &[Token], out: &mut Vec<Token>) {
         if is_consonant(current, "ग") && is_raw(next, "*") {
             let next_after_star = tokens.get(i + 2);
             let consumed_a = push_with_optional_akar(out, "ग़", next_after_star);
+            i += if consumed_a { 3 } else { 2 };
+            continue;
+        }
+
+        if is_consonant(current, "ज") && is_raw(next, "*") {
+            let next_after_star = tokens.get(i + 2);
+            let consumed_a = push_with_optional_akar(out, "ज़", next_after_star);
+            i += if consumed_a { 3 } else { 2 };
+            continue;
+        }
+
+        if is_consonant(current, "ड") && is_raw(next, "*") {
+            let next_after_star = tokens.get(i + 2);
+            let consumed_a = push_with_optional_akar(out, "ड़", next_after_star);
+            i += if consumed_a { 3 } else { 2 };
+            continue;
+        }
+
+        if is_consonant(current, "ढ") && is_raw(next, "*") {
+            let next_after_star = tokens.get(i + 2);
+            let consumed_a = push_with_optional_akar(out, "ढ़", next_after_star);
             i += if consumed_a { 3 } else { 2 };
             continue;
         }
@@ -543,7 +741,42 @@ fn mapped_panchama(target: &str) -> Option<&'static str> {
     None
 }
 
-fn apply_nasalization_rule_into(tokens: &[Token], options: &RuleOptions, out: &mut Vec<Token>) {
+fn is_nasal_consonant(glyph: &str, is_devanagari: bool) -> bool {
+    const DEVANAGARI_NASALS: [&str; 5] = ["ङ", "ञ", "ण", "न", "म"];
+    const NASAL_OFFSETS: [u32; 5] = [0x19, 0x1E, 0x23, 0x28, 0x2E];
+
+    if is_devanagari {
+        return DEVANAGARI_NASALS.contains(&glyph);
+    }
+
+    let cp = match glyph.chars().next() {
+        Some(ch) => ch as u32,
+        None => return false,
+    };
+
+    if !(0x0900..=0x0DFF).contains(&cp) {
+        return false;
+    }
+
+    let block_base = cp & 0xFF80;
+    let offset = cp - block_base;
+    NASAL_OFFSETS.contains(&offset)
+}
+
+fn apply_nasalization_rule_into(
+    tokens: &[Token],
+    options: &RuleOptions,
+    script_rules: &ScriptRuleConfig,
+    out: &mut Vec<Token>,
+) {
+    let effective_mode = if options.nasalization_mode == NasalizationMode::Panchamakshar
+        && !script_rules.is_devanagari
+    {
+        &NasalizationMode::Anusvara
+    } else {
+        &options.nasalization_mode
+    };
+
     out.clear();
     out.reserve(tokens.len());
     let mut i = 0usize;
@@ -553,7 +786,7 @@ fn apply_nasalization_rule_into(tokens: &[Token], options: &RuleOptions, out: &m
         let t1 = tokens.get(i + 1);
         let t2 = tokens.get(i + 2);
 
-        let is_nasal_cluster = matches!(t0, Some(Token::Consonant(g)) if ["ङ", "ञ", "ण", "न", "म"].contains(&g.as_str()))
+        let is_nasal_cluster = matches!(t0, Some(Token::Consonant(g)) if is_nasal_consonant(g, script_rules.is_devanagari))
             && matches!(t1, Some(Token::Halant(_)))
             && matches!(t2, Some(Token::Consonant(_)));
 
@@ -563,8 +796,8 @@ fn apply_nasalization_rule_into(tokens: &[Token], options: &RuleOptions, out: &m
             continue;
         }
 
-        if options.nasalization_mode == NasalizationMode::Anusvara {
-            out.push(Token::Mark(ANUSVARA.to_owned()));
+        if *effective_mode == NasalizationMode::Anusvara {
+            out.push(Token::Mark(script_rules.anusvara.to_owned()));
             i += 2;
             continue;
         }
@@ -592,13 +825,20 @@ fn ligature_for_pair(left: &str, right: &str) -> Option<&'static str> {
     if left == "त" && right == "य" {
         return Some("त्य");
     }
-    if left == "ग" && right == "य" {
-        return Some("ज्ञ");
-    }
     None
 }
 
-fn apply_ligature_rule_into(tokens: &[Token], out: &mut Vec<Token>) {
+fn apply_ligature_rule_into(
+    tokens: &[Token],
+    script_rules: &ScriptRuleConfig,
+    out: &mut Vec<Token>,
+) {
+    if !script_rules.is_devanagari {
+        out.clear();
+        out.extend(tokens.iter().cloned());
+        return;
+    }
+
     out.clear();
     out.reserve(tokens.len());
     let mut i = 0usize;
@@ -635,11 +875,11 @@ fn is_word_end(tokens: &[Token], index: usize) -> bool {
     next.is_none() || is_word_boundary_token(next)
 }
 
-fn apply_schwa_rule_in_place(out: &mut Vec<Token>) {
+fn apply_schwa_rule_in_place(out: &mut Vec<Token>, script_rules: &ScriptRuleConfig) {
     let mut i = 0usize;
 
     while i < out.len() {
-        if matches!(out.get(i), Some(Token::Mark(g)) if g == ANUSVARA)
+        if matches!(out.get(i), Some(Token::Mark(g)) if g == script_rules.anusvara)
             && matches!(out.get(i + 1), Some(Token::Consonant(_)))
             && matches!(out.get(i + 2), Some(Token::InherentA))
             && is_word_end(&out, i + 2)
@@ -687,25 +927,33 @@ fn apply_schwa_rule_in_place(out: &mut Vec<Token>) {
     }
 }
 
-fn run_rule_pipeline(tokens: Vec<Token>, options: &RuleOptions) -> Vec<Token> {
+fn run_rule_pipeline(
+    tokens: Vec<Token>,
+    options: &RuleOptions,
+    script_rules: &ScriptRuleConfig,
+    language_id: Option<&str>,
+) -> Vec<Token> {
     let mut primary = tokens;
     let mut secondary = Vec::with_capacity(primary.len().saturating_mul(2));
 
     if options.enable_nukta {
-        apply_nukta_rule_into(&primary, &mut secondary);
+        apply_nukta_rule_into(&primary, script_rules, &mut secondary);
         std::mem::swap(&mut primary, &mut secondary);
     }
 
-    apply_nasalization_rule_into(&primary, options, &mut secondary);
+    apply_nasalization_rule_into(&primary, options, script_rules, &mut secondary);
     std::mem::swap(&mut primary, &mut secondary);
 
     if options.enable_ligature_collapse {
-        apply_ligature_rule_into(&primary, &mut secondary);
+        apply_ligature_rule_into(&primary, script_rules, &mut secondary);
         std::mem::swap(&mut primary, &mut secondary);
     }
 
-    if options.enable_schwa_deletion {
-        apply_schwa_rule_in_place(&mut primary);
+    if options.enable_schwa_deletion
+        && script_rules.is_devanagari
+        && language_id != Some("sanskrit")
+    {
+        apply_schwa_rule_in_place(&mut primary, script_rules);
     }
 
     primary
@@ -733,10 +981,66 @@ fn compute_rendered(
     raw: &str,
     trie: &TrieNode<TransliterationEntry>,
     options: &RuleOptions,
+    script_rules: &ScriptRuleConfig,
+    language_id: Option<&str>,
 ) -> String {
-    let base_tokens = tokenize_buffer(raw, trie);
-    let post_tokens = run_rule_pipeline(base_tokens, options);
-    stringify_tokens(&post_tokens)
+    let base_tokens = tokenize_buffer(raw, trie, script_rules);
+    let post_tokens = run_rule_pipeline(base_tokens, options, script_rules, language_id);
+    let rendered = stringify_tokens(&post_tokens);
+    enforce_script_safety(rendered, raw, script_rules)
+}
+
+fn script_unicode_range(script_id: &str) -> Option<(u32, u32)> {
+    match script_id {
+        "devanagari" => Some((0x0900, 0x097F)),
+        "bengali" => Some((0x0980, 0x09FF)),
+        "gurmukhi" => Some((0x0A00, 0x0A7F)),
+        "gujarati" => Some((0x0A80, 0x0AFF)),
+        "odia" => Some((0x0B00, 0x0B7F)),
+        "tamil" => Some((0x0B80, 0x0BFF)),
+        "telugu" => Some((0x0C00, 0x0C7F)),
+        "kannada" => Some((0x0C80, 0x0CFF)),
+        "malayalam" => Some((0x0D00, 0x0D7F)),
+        _ => None,
+    }
+}
+
+fn enforce_script_safety(
+    rendered: String,
+    raw: &str,
+    script_rules: &ScriptRuleConfig,
+) -> String {
+    if script_rules.is_devanagari {
+        return rendered;
+    }
+
+    let mut candidate = if script_rules.nukta.is_empty() {
+        rendered.replace('़', "")
+    } else {
+        rendered.replace('़', script_rules.nukta)
+    };
+
+    let valid_range = script_unicode_range(script_rules.script_id);
+
+    let has_invalid_indic = candidate.chars().any(|ch| {
+        let cp = ch as u32;
+        if !(0x0900..=0x0DFF).contains(&cp) {
+            return false;
+        }
+        match valid_range {
+            Some((lo, hi)) => !(lo..=hi).contains(&cp),
+            None => true,
+        }
+    });
+
+    if has_invalid_indic {
+        return raw.to_owned();
+    }
+
+    if candidate.is_empty() {
+        candidate = raw.to_owned();
+    }
+    candidate
 }
 
 fn to_js_edit(edit: Edit) -> Result<JsValue, JsValue> {
@@ -928,39 +1232,49 @@ mod tests {
     fn compute_rendered_matches_basic_js_behaviors() {
         let trie = trie::build_trie(&test_map());
         let options = RuleOptions::default();
-        assert_eq!(compute_rendered("k", &trie, &options), "क");
-        assert_eq!(compute_rendered("kh", &trie, &options), "ख");
-        assert_eq!(compute_rendered("ka", &trie, &options), "क");
-        assert_eq!(compute_rendered("kA", &trie, &options), "का");
+        let script_rules = ScriptRuleConfig::from_script_id("devanagari");
+        assert_eq!(compute_rendered("k", &trie, &options, &script_rules, None), "क");
+        assert_eq!(compute_rendered("kh", &trie, &options, &script_rules, None), "ख");
+        assert_eq!(compute_rendered("ka", &trie, &options, &script_rules, None), "क");
+        assert_eq!(compute_rendered("kA", &trie, &options, &script_rules, None), "का");
     }
 
     #[test]
     fn rule_pipeline_nukta_ligature_schwa_paths() {
         let trie = trie::build_trie(&test_map());
         let options = RuleOptions::default();
-        assert_eq!(compute_rendered("qa", &trie, &options), "क़ा");
-        assert_eq!(compute_rendered("ksh", &trie, &options), "क्ष");
-        assert_eq!(compute_rendered("kay", &trie, &options), "काय");
-        assert_eq!(compute_rendered("kartos", &trie, &options), "करतोस");
+        let script_rules = ScriptRuleConfig::from_script_id("devanagari");
+        assert_eq!(compute_rendered("qa", &trie, &options, &script_rules, None), "क़ा");
+        assert_eq!(compute_rendered("ksh", &trie, &options, &script_rules, None), "क्ष");
+        assert_eq!(compute_rendered("kay", &trie, &options, &script_rules, None), "काय");
+        assert_eq!(
+            compute_rendered("kartos", &trie, &options, &script_rules, None),
+            "करतोस"
+        );
     }
 
     #[test]
     fn rule_options_toggles_affect_output() {
         let trie = trie::build_trie(&test_map());
+        let script_rules = ScriptRuleConfig::from_script_id("devanagari");
         let options = RuleOptions {
             enable_nukta: false,
             nasalization_mode: NasalizationMode::Anusvara,
             enable_ligature_collapse: false,
             enable_schwa_deletion: false,
         };
-        assert_eq!(compute_rendered("q", &trie, &options), "q");
-        assert_eq!(compute_rendered("ksh", &trie, &options), "क्श");
-        assert_eq!(compute_rendered("kartay", &trie, &options), "कर्तय");
+        assert_eq!(compute_rendered("q", &trie, &options, &script_rules, None), "q");
+        assert_eq!(compute_rendered("ksh", &trie, &options, &script_rules, None), "क्श");
+        assert_eq!(
+            compute_rendered("kartay", &trie, &options, &script_rules, None),
+            "कर्तय"
+        );
     }
 
     #[test]
     fn nasalization_modes_match_expected_behavior() {
         let trie = trie::build_trie(&test_map());
+        let script_rules = ScriptRuleConfig::from_script_id("devanagari");
         let default = RuleOptions::default();
         let panchama = RuleOptions {
             enable_nukta: true,
@@ -969,7 +1283,66 @@ mod tests {
             enable_schwa_deletion: true,
         };
 
-        assert_eq!(compute_rendered("anka", &trie, &default), "अंका");
-        assert_eq!(compute_rendered("anka", &trie, &panchama), "अङ्क");
+        assert_eq!(
+            compute_rendered("anka", &trie, &default, &script_rules, None),
+            "अंका"
+        );
+        assert_eq!(
+            compute_rendered("anka", &trie, &panchama, &script_rules, None),
+            "अङ्क"
+        );
+    }
+
+    #[test]
+    fn non_devanagari_runtime_guard_blocks_devanagari_leakage() {
+        let mut map = HashMap::new();
+        map.insert(
+            "k".to_owned(),
+            TransliterationEntry {
+                entry_type: "consonant".to_owned(),
+                glyph: "ক".to_owned(),
+                matra: None,
+            },
+        );
+        map.insert(
+            "t".to_owned(),
+            TransliterationEntry {
+                entry_type: "consonant".to_owned(),
+                glyph: "ত".to_owned(),
+                matra: None,
+            },
+        );
+        map.insert(
+            "a".to_owned(),
+            TransliterationEntry {
+                entry_type: "vowel".to_owned(),
+                glyph: "অ".to_owned(),
+                matra: Some(String::new()),
+            },
+        );
+        map.insert(
+            "q".to_owned(),
+            TransliterationEntry {
+                entry_type: "consonant".to_owned(),
+                glyph: "क़".to_owned(),
+                matra: None,
+            },
+        );
+        map.insert(
+            "f".to_owned(),
+            TransliterationEntry {
+                entry_type: "consonant".to_owned(),
+                glyph: "ফ़".to_owned(),
+                matra: None,
+            },
+        );
+
+        let trie = trie::build_trie(&map);
+        let options = RuleOptions::default();
+        let script_rules = ScriptRuleConfig::from_script_id("bengali");
+
+        assert_eq!(compute_rendered("kta", &trie, &options, &script_rules, None), "ক্ত");
+        assert_eq!(compute_rendered("qa", &trie, &options, &script_rules, None), "qa");
+        assert_eq!(compute_rendered("f", &trie, &options, &script_rules, None), "ফ়");
     }
 }

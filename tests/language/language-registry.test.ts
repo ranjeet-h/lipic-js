@@ -19,7 +19,17 @@ describe("language registry", () => {
   it("returns availability status by short code", () => {
     expect(isLanguageAvailable("hi")).toBe(true);
     expect(isLanguageAvailable("mr")).toBe(true);
-    expect(isLanguageAvailable("ne")).toBe(false);
+    expect(isLanguageAvailable("bn")).toBe(true);
+    expect(isLanguageAvailable("as")).toBe(true);
+    expect(isLanguageAvailable("ne")).toBe(true);
+    expect(isLanguageAvailable("sa")).toBe(true);
+    expect(isLanguageAvailable("gu")).toBe(true);
+    expect(isLanguageAvailable("pa")).toBe(true);
+    expect(isLanguageAvailable("ta")).toBe(true);
+    expect(isLanguageAvailable("te")).toBe(true);
+    expect(isLanguageAvailable("kn")).toBe(true);
+    expect(isLanguageAvailable("ml")).toBe(true);
+    expect(isLanguageAvailable("or")).toBe(true);
   });
 
   it("resolves engine config for available language", () => {
@@ -29,8 +39,11 @@ describe("language registry", () => {
     expect(Object.keys(cfg.expandedMap).length).toBeGreaterThan(0);
   });
 
-  it("throws for planned language", () => {
-    expect(() => resolveLanguageEngineConfig("ne")).toThrow("planned but not available");
-    expect(getLanguage("ne").status).toBe("planned");
+  it("resolves config for newly enabled language codes", () => {
+    expect(resolveLanguageEngineConfig("gu").scriptId).toBe("gujarati");
+    expect(resolveLanguageEngineConfig("pa").scriptId).toBe("gurmukhi");
+    expect(resolveLanguageEngineConfig("ta").scriptId).toBe("tamil");
+    expect(resolveLanguageEngineConfig("or").scriptId).toBe("odia");
+    expect(getLanguage("ne").status).toBe("available");
   });
 });

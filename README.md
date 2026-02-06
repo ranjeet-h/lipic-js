@@ -22,8 +22,7 @@ Transliteration library for web text inputs (`input`, `textarea`, `contenteditab
 | Odia | `or` (Odia) |
 
 Current implementation status:
-- Available now: `hi`, `mr`
-- Planned for upcoming RC: `ne`, `sa`, `bn`, `as`, `gu`, `pa`, `ta`, `te`, `kn`, `ml`, `or`
+- Available now: `hi`, `mr`, `ne`, `sa`, `bn`, `as`, `gu`, `pa`, `ta`, `te`, `kn`, `ml`, `or`
 
 ## Quick Start
 ```ts
@@ -111,3 +110,11 @@ With WASM build, artifacts are in:
 - `dist/`
 - `dist/wasm/rust_core.js`
 - `dist/wasm/rust_core_bg.wasm`
+
+## Regenerate All Language Maps
+```bash
+npm run generate-map:all-languages
+```
+
+This uses script mapping tables from:
+- [`@indic-transliteration/common_maps`](https://github.com/indic-transliteration/common_maps/tree/master)

@@ -11,6 +11,28 @@ import hindiPhoneticBase from "../maps/hindi/phonetic.base.json";
 import hindiPhoneticExpanded from "../maps/hindi/phonetic.expanded.json";
 import marathiPhoneticBase from "../maps/marathi/phonetic.base.json";
 import marathiPhoneticExpanded from "../maps/marathi/phonetic.expanded.json";
+import bengaliPhoneticBase from "../maps/bengali/phonetic.base.json";
+import bengaliPhoneticExpanded from "../maps/bengali/phonetic.expanded.json";
+import assamesePhoneticBase from "../maps/assamese/phonetic.base.json";
+import assamesePhoneticExpanded from "../maps/assamese/phonetic.expanded.json";
+import gujaratiPhoneticBase from "../maps/gujarati/phonetic.base.json";
+import gujaratiPhoneticExpanded from "../maps/gujarati/phonetic.expanded.json";
+import punjabiPhoneticBase from "../maps/punjabi/phonetic.base.json";
+import punjabiPhoneticExpanded from "../maps/punjabi/phonetic.expanded.json";
+import tamilPhoneticBase from "../maps/tamil/phonetic.base.json";
+import tamilPhoneticExpanded from "../maps/tamil/phonetic.expanded.json";
+import teluguPhoneticBase from "../maps/telugu/phonetic.base.json";
+import teluguPhoneticExpanded from "../maps/telugu/phonetic.expanded.json";
+import kannadaPhoneticBase from "../maps/kannada/phonetic.base.json";
+import kannadaPhoneticExpanded from "../maps/kannada/phonetic.expanded.json";
+import malayalamPhoneticBase from "../maps/malayalam/phonetic.base.json";
+import malayalamPhoneticExpanded from "../maps/malayalam/phonetic.expanded.json";
+import odiaPhoneticBase from "../maps/odia/phonetic.base.json";
+import odiaPhoneticExpanded from "../maps/odia/phonetic.expanded.json";
+import nepaliPhoneticBase from "../maps/nepali/phonetic.base.json";
+import nepaliPhoneticExpanded from "../maps/nepali/phonetic.expanded.json";
+import sanskritPhoneticBase from "../maps/sanskrit/phonetic.base.json";
+import sanskritPhoneticExpanded from "../maps/sanskrit/phonetic.expanded.json";
 export { buildTrie, walkLongest } from "./engine/trie";
 export { createWasmTrie } from "./engine/wasm-trie";
 export { createInputStack } from "./engine/input-stack";
@@ -101,6 +123,72 @@ export const maps = {
       base: marathiPhoneticBase,
       expanded: marathiPhoneticExpanded
     }
+  },
+  bengali: {
+    phonetic: {
+      base: bengaliPhoneticBase,
+      expanded: bengaliPhoneticExpanded
+    }
+  },
+  assamese: {
+    phonetic: {
+      base: assamesePhoneticBase,
+      expanded: assamesePhoneticExpanded
+    }
+  },
+  gujarati: {
+    phonetic: {
+      base: gujaratiPhoneticBase,
+      expanded: gujaratiPhoneticExpanded
+    }
+  },
+  punjabi: {
+    phonetic: {
+      base: punjabiPhoneticBase,
+      expanded: punjabiPhoneticExpanded
+    }
+  },
+  tamil: {
+    phonetic: {
+      base: tamilPhoneticBase,
+      expanded: tamilPhoneticExpanded
+    }
+  },
+  telugu: {
+    phonetic: {
+      base: teluguPhoneticBase,
+      expanded: teluguPhoneticExpanded
+    }
+  },
+  kannada: {
+    phonetic: {
+      base: kannadaPhoneticBase,
+      expanded: kannadaPhoneticExpanded
+    }
+  },
+  malayalam: {
+    phonetic: {
+      base: malayalamPhoneticBase,
+      expanded: malayalamPhoneticExpanded
+    }
+  },
+  odia: {
+    phonetic: {
+      base: odiaPhoneticBase,
+      expanded: odiaPhoneticExpanded
+    }
+  },
+  nepali: {
+    phonetic: {
+      base: nepaliPhoneticBase,
+      expanded: nepaliPhoneticExpanded
+    }
+  },
+  sanskrit: {
+    phonetic: {
+      base: sanskritPhoneticBase,
+      expanded: sanskritPhoneticExpanded
+    }
   }
 } as const;
 
@@ -117,5 +205,27 @@ export {
   hindiPhoneticBase,
   hindiPhoneticExpanded,
   marathiPhoneticBase,
-  marathiPhoneticExpanded
+  marathiPhoneticExpanded,
+  bengaliPhoneticBase,
+  bengaliPhoneticExpanded,
+  assamesePhoneticBase,
+  assamesePhoneticExpanded,
+  gujaratiPhoneticBase,
+  gujaratiPhoneticExpanded,
+  punjabiPhoneticBase,
+  punjabiPhoneticExpanded,
+  tamilPhoneticBase,
+  tamilPhoneticExpanded,
+  teluguPhoneticBase,
+  teluguPhoneticExpanded,
+  kannadaPhoneticBase,
+  kannadaPhoneticExpanded,
+  malayalamPhoneticBase,
+  malayalamPhoneticExpanded,
+  odiaPhoneticBase,
+  odiaPhoneticExpanded,
+  nepaliPhoneticBase,
+  nepaliPhoneticExpanded,
+  sanskritPhoneticBase,
+  sanskritPhoneticExpanded
 };

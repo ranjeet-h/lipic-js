@@ -1,5 +1,16 @@
 import hindiExpanded from "../../maps/hindi/phonetic.expanded.json";
 import marathiExpanded from "../../maps/marathi/phonetic.expanded.json";
+import bengaliExpanded from "../../maps/bengali/phonetic.expanded.json";
+import assameseExpanded from "../../maps/assamese/phonetic.expanded.json";
+import gujaratiExpanded from "../../maps/gujarati/phonetic.expanded.json";
+import punjabiExpanded from "../../maps/punjabi/phonetic.expanded.json";
+import tamilExpanded from "../../maps/tamil/phonetic.expanded.json";
+import teluguExpanded from "../../maps/telugu/phonetic.expanded.json";
+import kannadaExpanded from "../../maps/kannada/phonetic.expanded.json";
+import malayalamExpanded from "../../maps/malayalam/phonetic.expanded.json";
+import odiaExpanded from "../../maps/odia/phonetic.expanded.json";
+import nepaliExpanded from "../../maps/nepali/phonetic.expanded.json";
+import sanskritExpanded from "../../maps/sanskrit/phonetic.expanded.json";
 import type { TransliterationEngineOptions } from "../engine/transliteration-engine";
 
 export type LanguageCode =
@@ -58,17 +69,105 @@ const LANGUAGE_REGISTRY: Record<LanguageCode, LanguageDefinition> = {
     languageId: "marathi",
     expandedMap: marathiExpanded
   },
-  ne: { code: "ne", name: "Nepali", script: "Devanagari", status: "planned" },
-  sa: { code: "sa", name: "Sanskrit", script: "Devanagari", status: "planned" },
-  bn: { code: "bn", name: "Bengali", script: "Bengali", status: "planned" },
-  as: { code: "as", name: "Assamese", script: "Bengali", status: "planned" },
-  gu: { code: "gu", name: "Gujarati", script: "Gujarati", status: "planned" },
-  pa: { code: "pa", name: "Punjabi", script: "Gurmukhi", status: "planned" },
-  ta: { code: "ta", name: "Tamil", script: "Tamil", status: "planned" },
-  te: { code: "te", name: "Telugu", script: "Telugu", status: "planned" },
-  kn: { code: "kn", name: "Kannada", script: "Kannada", status: "planned" },
-  ml: { code: "ml", name: "Malayalam", script: "Malayalam", status: "planned" },
-  or: { code: "or", name: "Odia", script: "Odia", status: "planned" }
+  ne: {
+    code: "ne",
+    name: "Nepali",
+    script: "Devanagari",
+    status: "available",
+    scriptId: "devanagari",
+    languageId: "nepali",
+    expandedMap: nepaliExpanded
+  },
+  sa: {
+    code: "sa",
+    name: "Sanskrit",
+    script: "Devanagari",
+    status: "available",
+    scriptId: "devanagari",
+    languageId: "sanskrit",
+    expandedMap: sanskritExpanded
+  },
+  bn: {
+    code: "bn",
+    name: "Bengali",
+    script: "Bengali",
+    status: "available",
+    scriptId: "bengali",
+    languageId: "bengali",
+    expandedMap: bengaliExpanded
+  },
+  as: {
+    code: "as",
+    name: "Assamese",
+    script: "Bengali",
+    status: "available",
+    scriptId: "bengali",
+    languageId: "assamese",
+    expandedMap: assameseExpanded
+  },
+  gu: {
+    code: "gu",
+    name: "Gujarati",
+    script: "Gujarati",
+    status: "available",
+    scriptId: "gujarati",
+    languageId: "gujarati",
+    expandedMap: gujaratiExpanded
+  },
+  pa: {
+    code: "pa",
+    name: "Punjabi",
+    script: "Gurmukhi",
+    status: "available",
+    scriptId: "gurmukhi",
+    languageId: "punjabi",
+    expandedMap: punjabiExpanded
+  },
+  ta: {
+    code: "ta",
+    name: "Tamil",
+    script: "Tamil",
+    status: "available",
+    scriptId: "tamil",
+    languageId: "tamil",
+    expandedMap: tamilExpanded
+  },
+  te: {
+    code: "te",
+    name: "Telugu",
+    script: "Telugu",
+    status: "available",
+    scriptId: "telugu",
+    languageId: "telugu",
+    expandedMap: teluguExpanded
+  },
+  kn: {
+    code: "kn",
+    name: "Kannada",
+    script: "Kannada",
+    status: "available",
+    scriptId: "kannada",
+    languageId: "kannada",
+    expandedMap: kannadaExpanded
+  },
+  ml: {
+    code: "ml",
+    name: "Malayalam",
+    script: "Malayalam",
+    status: "available",
+    scriptId: "malayalam",
+    languageId: "malayalam",
+    expandedMap: malayalamExpanded
+  },
+  or: {
+    code: "or",
+    name: "Odia",
+    script: "Odia",
+    status: "available",
+    scriptId: "odia",
+    languageId: "odia",
+    expandedMap: odiaExpanded
+  }
 };
 
 export function listLanguages(): LanguageRegistryItem[] {

@@ -1,0 +1,201 @@
+{
+  "a": {
+    "type": "vowel",
+    "glyph": "ಅ",
+    "matra": ""
+  },
+  "aa": {
+    "type": "vowel",
+    "glyph": "ಆ",
+    "matra": "ಾ"
+  },
+  "i": {
+    "type": "vowel",
+    "glyph": "ಇ",
+    "matra": "ಿ"
+  },
+  "ii": {
+    "type": "vowel",
+    "glyph": "ಈ",
+    "matra": "ೀ"
+  },
+  "u": {
+    "type": "vowel",
+    "glyph": "ಉ",
+    "matra": "ು"
+  },
+  "uu": {
+    "type": "vowel",
+    "glyph": "ಊ",
+    "matra": "ೂ"
+  },
+  "ri": {
+    "type": "vowel",
+    "glyph": "ಋ",
+    "matra": "ೃ"
+  },
+  "e": {
+    "type": "vowel",
+    "glyph": "ಏ",
+    "matra": "ೇ"
+  },
+  "ai": {
+    "type": "vowel",
+    "glyph": "ಐ",
+    "matra": "ೈ"
+  },
+  "o": {
+    "type": "vowel",
+    "glyph": "ಓ",
+    "matra": "ೋ"
+  },
+  "au": {
+    "type": "vowel",
+    "glyph": "ಔ",
+    "matra": "ೌ"
+  },
+  "k": {
+    "type": "consonant",
+    "glyph": "ಕ"
+  },
+  "kh": {
+    "type": "consonant",
+    "glyph": "ಖ"
+  },
+  "g": {
+    "type": "consonant",
+    "glyph": "ಗ"
+  },
+  "gh": {
+    "type": "consonant",
+    "glyph": "ಘ"
+  },
+  "ng": {
+    "type": "consonant",
+    "glyph": "ಙ"
+  },
+  "ch": {
+    "type": "consonant",
+    "glyph": "ಚ"
+  },
+  "chh": {
+    "type": "consonant",
+    "glyph": "ಛ"
+  },
+  "j": {
+    "type": "consonant",
+    "glyph": "ಜ"
+  },
+  "jh": {
+    "type": "consonant",
+    "glyph": "ಝ"
+  },
+  "ny": {
+    "type": "consonant",
+    "glyph": "ಞ"
+  },
+  "T": {
+    "type": "consonant",
+    "glyph": "ಟ"
+  },
+  "Th": {
+    "type": "consonant",
+    "glyph": "ಠ"
+  },
+  "D": {
+    "type": "consonant",
+    "glyph": "ಡ"
+  },
+  "Dh": {
+    "type": "consonant",
+    "glyph": "ಢ"
+  },
+  "N": {
+    "type": "consonant",
+    "glyph": "ಣ"
+  },
+  "t": {
+    "type": "consonant",
+    "glyph": "ತ"
+  },
+  "th": {
+    "type": "consonant",
+    "glyph": "ಥ"
+  },
+  "d": {
+    "type": "consonant",
+    "glyph": "ದ"
+  },
+  "dh": {
+    "type": "consonant",
+    "glyph": "ಧ"
+  },
+  "n": {
+    "type": "consonant",
+    "glyph": "ನ"
+  },
+  "p": {
+    "type": "consonant",
+    "glyph": "ಪ"
+  },
+  "ph": {
+    "type": "consonant",
+    "glyph": "ಫ"
+  },
+  "b": {
+    "type": "consonant",
+    "glyph": "ಬ"
+  },
+  "bh": {
+    "type": "consonant",
+    "glyph": "ಭ"
+  },
+  "m": {
+    "type": "consonant",
+    "glyph": "ಮ"
+  },
+  "y": {
+    "type": "consonant",
+    "glyph": "ಯ"
+  },
+  "r": {
+    "type": "consonant",
+    "glyph": "ರ"
+  },
+  "l": {
+    "type": "consonant",
+    "glyph": "ಲ"
+  },
+  "v": {
+    "type": "consonant",
+    "glyph": "ವ"
+  },
+  "sh": {
+    "type": "consonant",
+    "glyph": "ಶ"
+  },
+  "Sh": {
+    "type": "consonant",
+    "glyph": "ಷ"
+  },
+  "s": {
+    "type": "consonant",
+    "glyph": "ಸ"
+  },
+  "h": {
+    "type": "consonant",
+    "glyph": "ಹ"
+  },
+  "M": {
+    "type": "mark",
+    "glyph": "ಂ"
+  },
+  "MM": {
+    "type": "mark",
+    "glyph": "ಁ"
+  },
+  "H": {
+    "type": "mark",
+    "glyph": "ಃ"
+  }
+}

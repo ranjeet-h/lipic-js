@@ -1,0 +1,196 @@
+{
+  "a": {
+    "type": "vowel",
+    "glyph": "ਅ",
+    "matra": ""
+  },
+  "aa": {
+    "type": "vowel",
+    "glyph": "ਆ",
+    "matra": "ਾ"
+  },
+  "i": {
+    "type": "vowel",
+    "glyph": "ਇ",
+    "matra": "ਿ"
+  },
+  "ii": {
+    "type": "vowel",
+    "glyph": "ਈ",
+    "matra": "ੀ"
+  },
+  "u": {
+    "type": "vowel",
+    "glyph": "ਉ",
+    "matra": "ੁ"
+  },
+  "uu": {
+    "type": "vowel",
+    "glyph": "ਊ",
+    "matra": "ੂ"
+  },
+  "e": {
+    "type": "vowel",
+    "glyph": "ਏ",
+    "matra": "ੇ"
+  },
+  "ai": {
+    "type": "vowel",
+    "glyph": "ਐ",
+    "matra": "ੈ"
+  },
+  "o": {
+    "type": "vowel",
+    "glyph": "ਓ",
+    "matra": "ੋ"
+  },
+  "au": {
+    "type": "vowel",
+    "glyph": "ਔ",
+    "matra": "ੌ"
+  },
+  "k": {
+    "type": "consonant",
+    "glyph": "ਕ"
+  },
+  "kh": {
+    "type": "consonant",
+    "glyph": "ਖ"
+  },
+  "g": {
+    "type": "consonant",
+    "glyph": "ਗ"
+  },
+  "gh": {
+    "type": "consonant",
+    "glyph": "ਘ"
+  },
+  "ng": {
+    "type": "consonant",
+    "glyph": "ਙ"
+  },
+  "ch": {
+    "type": "consonant",
+    "glyph": "ਚ"
+  },
+  "chh": {
+    "type": "consonant",
+    "glyph": "ਛ"
+  },
+  "j": {
+    "type": "consonant",
+    "glyph": "ਜ"
+  },
+  "jh": {
+    "type": "consonant",
+    "glyph": "ਝ"
+  },
+  "ny": {
+    "type": "consonant",
+    "glyph": "ਞ"
+  },
+  "T": {
+    "type": "consonant",
+    "glyph": "ਟ"
+  },
+  "Th": {
+    "type": "consonant",
+    "glyph": "ਠ"
+  },
+  "D": {
+    "type": "consonant",
+    "glyph": "ਡ"
+  },
+  "Dh": {
+    "type": "consonant",
+    "glyph": "ਢ"
+  },
+  "N": {
+    "type": "consonant",
+    "glyph": "ਣ"
+  },
+  "t": {
+    "type": "consonant",
+    "glyph": "ਤ"
+  },
+  "th": {
+    "type": "consonant",
+    "glyph": "ਥ"
+  },
+  "d": {
+    "type": "consonant",
+    "glyph": "ਦ"
+  },
+  "dh": {
+    "type": "consonant",
+    "glyph": "ਧ"
+  },
+  "n": {
+    "type": "consonant",
+    "glyph": "ਨ"
+  },
+  "p": {
+    "type": "consonant",
+    "glyph": "ਪ"
+  },
+  "ph": {
+    "type": "consonant",
+    "glyph": "ਫ"
+  },
+  "b": {
+    "type": "consonant",
+    "glyph": "ਬ"
+  },
+  "bh": {
+    "type": "consonant",
+    "glyph": "ਭ"
+  },
+  "m": {
+    "type": "consonant",
+    "glyph": "ਮ"
+  },
+  "y": {
+    "type": "consonant",
+    "glyph": "ਯ"
+  },
+  "r": {
+    "type": "consonant",
+    "glyph": "ਰ"
+  },
+  "l": {
+    "type": "consonant",
+    "glyph": "ਲ"
+  },
+  "v": {
+    "type": "consonant",
+    "glyph": "ਵ"
+  },
+  "sh": {
+    "type": "consonant",
+    "glyph": "ਸ਼"
+  },
+  "s": {
+    "type": "consonant",
+    "glyph": "ਸ"
+  },
+  "h": {
+    "type": "consonant",
+    "glyph": "ਹ"
+  },
+  "M": {
+    "type": "mark",
+    "glyph": "ਂ"
+  },
+  "MM": {
+    "type": "mark",
+    "glyph": "ਁ"
+  },
+  "H": {
+    "type": "mark",
+    "glyph": "ਃ"
+  },
+  "Sh": {
+    "type": "consonant",
+    "glyph": "ਸ਼"
+  }
+}

@@ -1,7 +1,21 @@
 import type { RuleContext, RuleFn, Token } from "./types";
-import { ANUSVARA } from "./types";
 
-const NASAL_GLYPHS = new Set(["ङ", "ञ", "ण", "न", "म"]);
+const DEVANAGARI_NASAL_GLYPHS = new Set(["ङ", "ञ", "ण", "न", "म"]);
+
+const NASAL_OFFSETS = new Set([0x19, 0x1E, 0x23, 0x28, 0x2E]);
+
+function isNasalConsonant(glyph: string, scriptKind: string): boolean {
+  if (scriptKind === "devanagari") {
+    return DEVANAGARI_NASAL_GLYPHS.has(glyph);
+  }
+  if (glyph.length === 0) return false;
+  const cp = glyph.codePointAt(0)!;
+  if (cp < 0x0900 || cp > 0x0DFF) return false;
+  const blockBase = cp & 0xFF80;
+  const offset = cp - blockBase;
+  return NASAL_OFFSETS.has(offset);
+}
+
 const VARGA_TO_NASAL: Array<{ chars: Set<string>; nasal: string }> = [
   { chars: new Set(["क", "ख", "ग", "घ"]), nasal: "ङ" },
   { chars: new Set(["च", "छ", "ज", "झ"]), nasal: "ञ" },
@@ -20,6 +34,11 @@ function mappedPanchama(target: string): string | null {
 }
 
 export const applyNasalizationRule: RuleFn = (tokens: Token[], ctx: RuleContext): Token[] => {
+  const effectiveMode =
+    ctx.options.nasalizationMode === "panchamakshar" && ctx.script.kind !== "devanagari"
+      ? "anusvara"
+      : ctx.options.nasalizationMode;
+
   const out: Token[] = [];
 
   for (let i = 0; i < tokens.length; i += 1) {
@@ -29,7 +48,7 @@ export const applyNasalizationRule: RuleFn = (tokens: Token[], ctx: RuleContext)
 
     const isNasalCluster =
       t0?.kind === "consonant" &&
-      NASAL_GLYPHS.has(t0.glyph) &&
+      isNasalConsonant(t0.glyph, ctx.script.kind) &&
       t1?.kind === "halant" &&
       t2?.kind === "consonant";
 
@@ -38,8 +57,8 @@ export const applyNasalizationRule: RuleFn = (tokens: Token[], ctx: RuleContext)
       continue;
     }
 
-    if (ctx.options.nasalizationMode === "anusvara") {
-      out.push({ kind: "mark", glyph: ANUSVARA });
+    if (effectiveMode === "anusvara") {
+      out.push({ kind: "mark", glyph: ctx.script.anusvara });
       i += 1;
       continue;
     }

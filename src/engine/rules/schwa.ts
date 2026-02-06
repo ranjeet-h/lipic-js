@@ -1,5 +1,5 @@
 import type { RuleContext, RuleFn, Token } from "./types";
-import { ANUSVARA, isWordBoundaryToken } from "./types";
+import { isWordBoundaryToken } from "./types";
 
 function isConsonantGlyph(token: Token | undefined, glyph: string): boolean {
   return token?.kind === "consonant" && token.glyph === glyph;
@@ -23,12 +23,16 @@ function isWordEnd(tokens: Token[], index: number): boolean {
 }
 
 export const applySchwaRule: RuleFn = (tokens: Token[], _ctx: RuleContext): Token[] => {
+  if (_ctx.script.kind !== "devanagari" || _ctx.languageId === "sanskrit") {
+    return tokens;
+  }
+
   const out = tokens.map((t) => ({ ...t } as Token));
 
   for (let i = 0; i < out.length; i += 1) {
     // Pattern: ... ं + consonant + inherentA at word end => ... ं + consonant + ा
     if (
-      isMarkGlyph(out[i], ANUSVARA) &&
+      isMarkGlyph(out[i], _ctx.script.anusvara) &&
       isKind(out[i + 1], "consonant") &&
       isKind(out[i + 2], "inherentA") &&
       isWordEnd(out, i + 2)

@@ -4,11 +4,14 @@ function ligatureForPair(left: string, right: string): string | null {
   if (left === "क" && (right === "ष" || right === "श")) return "क्ष";
   if (left === "ज" && right === "ञ") return "ज्ञ";
   if (left === "त" && right === "य") return "त्य";
-  if (left === "ग" && right === "य") return "ज्ञ";
   return null;
 }
 
 export const applyLigatureRule: RuleFn = (tokens: Token[], _ctx: RuleContext): Token[] => {
+  if (_ctx.script.kind !== "devanagari") {
+    return tokens;
+  }
+
   const out: Token[] = [];
 
   for (let i = 0; i < tokens.length; i += 1) {

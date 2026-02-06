@@ -1,0 +1,273 @@
+{
+  "a": {
+    "type": "vowel",
+    "glyph": "અ",
+    "matra": ""
+  },
+  "A": {
+    "type": "vowel",
+    "glyph": "આ",
+    "matra": "ા"
+  },
+  "aa": {
+    "type": "vowel",
+    "glyph": "આ",
+    "matra": "ા"
+  },
+  "i": {
+    "type": "vowel",
+    "glyph": "ઇ",
+    "matra": "િ"
+  },
+  "I": {
+    "type": "vowel",
+    "glyph": "ઈ",
+    "matra": "ી"
+  },
+  "ii": {
+    "type": "vowel",
+    "glyph": "ઈ",
+    "matra": "ી"
+  },
+  "u": {
+    "type": "vowel",
+    "glyph": "ઉ",
+    "matra": "ુ"
+  },
+  "U": {
+    "type": "vowel",
+    "glyph": "ઊ",
+    "matra": "ૂ"
+  },
+  "uu": {
+    "type": "vowel",
+    "glyph": "ઊ",
+    "matra": "ૂ"
+  },
+  "ri": {
+    "type": "vowel",
+    "glyph": "ઋ",
+    "matra": "ૃ"
+  },
+  "R": {
+    "type": "vowel",
+    "glyph": "ઋ",
+    "matra": "ૃ"
+  },
+  "e": {
+    "type": "vowel",
+    "glyph": "એ",
+    "matra": "ે"
+  },
+  "ai": {
+    "type": "vowel",
+    "glyph": "ઐ",
+    "matra": "ૈ"
+  },
+  "o": {
+    "type": "vowel",
+    "glyph": "ઓ",
+    "matra": "ો"
+  },
+  "au": {
+    "type": "vowel",
+    "glyph": "ઔ",
+    "matra": "ૌ"
+  },
+  "k": {
+    "type": "consonant",
+    "glyph": "ક"
+  },
+  "kh": {
+    "type": "consonant",
+    "glyph": "ખ"
+  },
+  "g": {
+    "type": "consonant",
+    "glyph": "ગ"
+  },
+  "gh": {
+    "type": "consonant",
+    "glyph": "ઘ"
+  },
+  "ng": {
+    "type": "consonant",
+    "glyph": "ઙ"
+  },
+  "ch": {
+    "type": "consonant",
+    "glyph": "ચ"
+  },
+  "chh": {
+    "type": "consonant",
+    "glyph": "છ"
+  },
+  "j": {
+    "type": "consonant",
+    "glyph": "જ"
+  },
+  "jh": {
+    "type": "consonant",
+    "glyph": "ઝ"
+  },
+  "ny": {
+    "type": "consonant",
+    "glyph": "ઞ"
+  },
+  "T": {
+    "type": "consonant",
+    "glyph": "ટ"
+  },
+  "Th": {
+    "type": "consonant",
+    "glyph": "ઠ"
+  },
+  "D": {
+    "type": "consonant",
+    "glyph": "ડ"
+  },
+  "Dh": {
+    "type": "consonant",
+    "glyph": "ઢ"
+  },
+  "N": {
+    "type": "consonant",
+    "glyph": "ણ"
+  },
+  "t": {
+    "type": "consonant",
+    "glyph": "ત"
+  },
+  "th": {
+    "type": "consonant",
+    "glyph": "થ"
+  },
+  "d": {
+    "type": "consonant",
+    "glyph": "દ"
+  },
+  "dh": {
+    "type": "consonant",
+    "glyph": "ધ"
+  },
+  "n": {
+    "type": "consonant",
+    "glyph": "ન"
+  },
+  "p": {
+    "type": "consonant",
+    "glyph": "પ"
+  },
+  "ph": {
+    "type": "consonant",
+    "glyph": "ફ"
+  },
+  "b": {
+    "type": "consonant",
+    "glyph": "બ"
+  },
+  "bh": {
+    "type": "consonant",
+    "glyph": "ભ"
+  },
+  "m": {
+    "type": "consonant",
+    "glyph": "મ"
+  },
+  "y": {
+    "type": "consonant",
+    "glyph": "ય"
+  },
+  "r": {
+    "type": "consonant",
+    "glyph": "ર"
+  },
+  "l": {
+    "type": "consonant",
+    "glyph": "લ"
+  },
+  "v": {
+    "type": "consonant",
+    "glyph": "વ"
+  },
+  "w": {
+    "type": "consonant",
+    "glyph": "વ"
+  },
+  "sh": {
+    "type": "consonant",
+    "glyph": "શ"
+  },
+  "S": {
+    "type": "consonant",
+    "glyph": "શ"
+  },
+  "Sh": {
+    "type": "consonant",
+    "glyph": "ષ"
+  },
+  "s": {
+    "type": "consonant",
+    "glyph": "સ"
+  },
+  "h": {
+    "type": "consonant",
+    "glyph": "હ"
+  },
+  "M": {
+    "type": "mark",
+    "glyph": "ં"
+  },
+  "MM": {
+    "type": "mark",
+    "glyph": "ઁ"
+  },
+  "H": {
+    "type": "mark",
+    "glyph": "ઃ"
+  },
+  "ksh": {
+    "type": "conjunct",
+    "glyph": "ક્ષ"
+  },
+  "x": {
+    "type": "conjunct",
+    "glyph": "ક્ષ"
+  },
+  "gy": {
+    "type": "conjunct",
+    "glyph": "જ્ઞ"
+  },
+  "dny": {
+    "type": "conjunct",
+    "glyph": "જ્ઞ"
+  },
+  "jn": {
+    "type": "conjunct",
+    "glyph": "જ્ઞ"
+  },
+  "tr": {
+    "type": "conjunct",
+    "glyph": "ત્ર"
+  },
+  "shr": {
+    "type": "conjunct",
+    "glyph": "શ્ર"
+  },
+  "z": {
+    "type": "consonant",
+    "glyph": "જ઼"
+  },
+  "f": {
+    "type": "consonant",
+    "glyph": "ફ઼"
+  },
+  "Rr": {
+    "type": "consonant",
+    "glyph": "ડ઼"
+  },
+  "Rh": {
+    "type": "consonant",
+    "glyph": "ઢ઼"
+  }
+}

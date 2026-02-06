@@ -1,5 +1,13 @@
 export type NasalizationMode = "anusvara" | "panchamakshar";
 
+export interface ScriptRuleConfig {
+  scriptId: string;
+  kind: "devanagari" | "generic";
+  halant: string;
+  anusvara: string;
+  nukta: string;
+}
+
 export interface EngineRuleOptions {
   enableNukta: boolean;
   nasalizationMode: NasalizationMode;
@@ -18,12 +26,11 @@ export type Token =
 
 export interface RuleContext {
   options: EngineRuleOptions;
+  script: ScriptRuleConfig;
+  languageId?: string;
 }
 
 export type RuleFn = (tokens: Token[], ctx: RuleContext) => Token[];
-
-export const HALANT = "्";
-export const ANUSVARA = "ं";
 
 export function isWordBoundaryToken(token: Token): boolean {
   if (token.kind !== "raw") {

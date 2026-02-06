@@ -35,16 +35,21 @@ describe("enableTransliteration", () => {
     enabled.detach();
   });
 
-  it("throws for planned but unavailable language code", async () => {
+  it("supports newly available language code", async () => {
     const textarea = document.createElement("textarea");
+    textarea.value = "";
+    textarea.setSelectionRange(0, 0);
     document.body.appendChild(textarea);
 
-    await expect(
-      enableTransliteration({
-        language: "ne",
-        elements: [textarea],
-        engineFactoryOptions: { preferWasm: false }
-      })
-    ).rejects.toThrow("planned but not available");
+    const enabled = await enableTransliteration({
+      language: "ne",
+      elements: [textarea],
+      engineFactoryOptions: { preferWasm: false }
+    });
+
+    const evt = beforeInput(textarea, "k");
+    expect(evt.defaultPrevented).toBe(true);
+    expect(textarea.value.length).toBeGreaterThan(0);
+    enabled.detach();
   });
 });

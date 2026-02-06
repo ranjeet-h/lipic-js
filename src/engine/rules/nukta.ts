@@ -22,6 +22,10 @@ function pushWithOptionalAkar(out: Token[], consonantGlyph: string, next: Token 
 }
 
 export const applyNuktaRule: RuleFn = (tokens: Token[], _ctx: RuleContext): Token[] => {
+  if (_ctx.script.kind !== "devanagari") {
+    return tokens;
+  }
+
   const out: Token[] = [];
 
   for (let i = 0; i < tokens.length; i += 1) {
@@ -42,6 +46,39 @@ export const applyNuktaRule: RuleFn = (tokens: Token[], _ctx: RuleContext): Toke
     if (isConsonant(current, "ग") && isRaw(next, "*")) {
       const nextAfterStar = tokens[i + 2];
       const consumedA = pushWithOptionalAkar(out, "ग़", nextAfterStar);
+      if (consumedA) {
+        i += 2;
+        continue;
+      }
+      i += 1;
+      continue;
+    }
+
+    if (isConsonant(current, "ज") && isRaw(next, "*")) {
+      const nextAfterStar = tokens[i + 2];
+      const consumedA = pushWithOptionalAkar(out, "ज़", nextAfterStar);
+      if (consumedA) {
+        i += 2;
+        continue;
+      }
+      i += 1;
+      continue;
+    }
+
+    if (isConsonant(current, "ड") && isRaw(next, "*")) {
+      const nextAfterStar = tokens[i + 2];
+      const consumedA = pushWithOptionalAkar(out, "ड़", nextAfterStar);
+      if (consumedA) {
+        i += 2;
+        continue;
+      }
+      i += 1;
+      continue;
+    }
+
+    if (isConsonant(current, "ढ") && isRaw(next, "*")) {
+      const nextAfterStar = tokens[i + 2];
+      const consumedA = pushWithOptionalAkar(out, "ढ़", nextAfterStar);
       if (consumedA) {
         i += 2;
         continue;

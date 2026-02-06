@@ -1,0 +1,273 @@
+{
+  "a": {
+    "type": "vowel",
+    "glyph": "ଅ",
+    "matra": ""
+  },
+  "A": {
+    "type": "vowel",
+    "glyph": "ଆ",
+    "matra": "ା"
+  },
+  "aa": {
+    "type": "vowel",
+    "glyph": "ଆ",
+    "matra": "ା"
+  },
+  "i": {
+    "type": "vowel",
+    "glyph": "ଇ",
+    "matra": "ି"
+  },
+  "I": {
+    "type": "vowel",
+    "glyph": "ଈ",
+    "matra": "ୀ"
+  },
+  "ii": {
+    "type": "vowel",
+    "glyph": "ଈ",
+    "matra": "ୀ"
+  },
+  "u": {
+    "type": "vowel",
+    "glyph": "ଉ",
+    "matra": "ୁ"
+  },
+  "U": {
+    "type": "vowel",
+    "glyph": "ଊ",
+    "matra": "ୂ"
+  },
+  "uu": {
+    "type": "vowel",
+    "glyph": "ଊ",
+    "matra": "ୂ"
+  },
+  "ri": {
+    "type": "vowel",
+    "glyph": "ଋ",
+    "matra": "ୃ"
+  },
+  "R": {
+    "type": "vowel",
+    "glyph": "ଋ",
+    "matra": "ୃ"
+  },
+  "e": {
+    "type": "vowel",
+    "glyph": "ଏ",
+    "matra": "େ"
+  },
+  "ai": {
+    "type": "vowel",
+    "glyph": "ଐ",
+    "matra": "ୈ"
+  },
+  "o": {
+    "type": "vowel",
+    "glyph": "ଓ",
+    "matra": "ୋ"
+  },
+  "au": {
+    "type": "vowel",
+    "glyph": "ଔ",
+    "matra": "ୌ"
+  },
+  "k": {
+    "type": "consonant",
+    "glyph": "କ"
+  },
+  "kh": {
+    "type": "consonant",
+    "glyph": "ଖ"
+  },
+  "g": {
+    "type": "consonant",
+    "glyph": "ଗ"
+  },
+  "gh": {
+    "type": "consonant",
+    "glyph": "ଘ"
+  },
+  "ng": {
+    "type": "consonant",
+    "glyph": "ଙ"
+  },
+  "ch": {
+    "type": "consonant",
+    "glyph": "ଚ"
+  },
+  "chh": {
+    "type": "consonant",
+    "glyph": "ଛ"
+  },
+  "j": {
+    "type": "consonant",
+    "glyph": "ଜ"
+  },
+  "jh": {
+    "type": "consonant",
+    "glyph": "ଝ"
+  },
+  "ny": {
+    "type": "consonant",
+    "glyph": "ଞ"
+  },
+  "T": {
+    "type": "consonant",
+    "glyph": "ଟ"
+  },
+  "Th": {
+    "type": "consonant",
+    "glyph": "ଠ"
+  },
+  "D": {
+    "type": "consonant",
+    "glyph": "ଡ"
+  },
+  "Dh": {
+    "type": "consonant",
+    "glyph": "ଢ"
+  },
+  "N": {
+    "type": "consonant",
+    "glyph": "ଣ"
+  },
+  "t": {
+    "type": "consonant",
+    "glyph": "ତ"
+  },
+  "th": {
+    "type": "consonant",
+    "glyph": "ଥ"
+  },
+  "d": {
+    "type": "consonant",
+    "glyph": "ଦ"
+  },
+  "dh": {
+    "type": "consonant",
+    "glyph": "ଧ"
+  },
+  "n": {
+    "type": "consonant",
+    "glyph": "ନ"
+  },
+  "p": {
+    "type": "consonant",
+    "glyph": "ପ"
+  },
+  "ph": {
+    "type": "consonant",
+    "glyph": "ଫ"
+  },
+  "b": {
+    "type": "consonant",
+    "glyph": "ବ"
+  },
+  "bh": {
+    "type": "consonant",
+    "glyph": "ଭ"
+  },
+  "m": {
+    "type": "consonant",
+    "glyph": "ମ"
+  },
+  "y": {
+    "type": "consonant",
+    "glyph": "ଯ"
+  },
+  "r": {
+    "type": "consonant",
+    "glyph": "ର"
+  },
+  "l": {
+    "type": "consonant",
+    "glyph": "ଲ"
+  },
+  "v": {
+    "type": "consonant",
+    "glyph": "ଵ"
+  },
+  "w": {
+    "type": "consonant",
+    "glyph": "ୱ"
+  },
+  "sh": {
+    "type": "consonant",
+    "glyph": "ଶ"
+  },
+  "S": {
+    "type": "consonant",
+    "glyph": "ଶ"
+  },
+  "Sh": {
+    "type": "consonant",
+    "glyph": "ଷ"
+  },
+  "s": {
+    "type": "consonant",
+    "glyph": "ସ"
+  },
+  "h": {
+    "type": "consonant",
+    "glyph": "ହ"
+  },
+  "M": {
+    "type": "mark",
+    "glyph": "ଂ"
+  },
+  "MM": {
+    "type": "mark",
+    "glyph": "ଁ"
+  },
+  "H": {
+    "type": "mark",
+    "glyph": "ଃ"
+  },
+  "ksh": {
+    "type": "conjunct",
+    "glyph": "କ୍ଷ"
+  },
+  "x": {
+    "type": "conjunct",
+    "glyph": "କ୍ଷ"
+  },
+  "gy": {
+    "type": "conjunct",
+    "glyph": "ଜ୍ଞ"
+  },
+  "dny": {
+    "type": "conjunct",
+    "glyph": "ଜ୍ଞ"
+  },
+  "jn": {
+    "type": "conjunct",
+    "glyph": "ଜ୍ଞ"
+  },
+  "tr": {
+    "type": "conjunct",
+    "glyph": "ତ୍ର"
+  },
+  "shr": {
+    "type": "conjunct",
+    "glyph": "ଶ୍ର"
+  },
+  "z": {
+    "type": "consonant",
+    "glyph": "ଜ଼"
+  },
+  "f": {
+    "type": "consonant",
+    "glyph": "ଫ଼"
+  },
+  "Rr": {
+    "type": "consonant",
+    "glyph": "ଡ଼"
+  },
+  "Rh": {
+    "type": "consonant",
+    "glyph": "ଢ଼"
+  }
+}

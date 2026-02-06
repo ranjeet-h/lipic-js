@@ -56,6 +56,72 @@
     "./maps/marathi/phonetic.expanded": {
       "default": "./maps/marathi/phonetic.expanded.json"
     },
+    "./maps/bengali/phonetic.base": {
+      "default": "./maps/bengali/phonetic.base.json"
+    },
+    "./maps/bengali/phonetic.expanded": {
+      "default": "./maps/bengali/phonetic.expanded.json"
+    },
+    "./maps/assamese/phonetic.base": {
+      "default": "./maps/assamese/phonetic.base.json"
+    },
+    "./maps/assamese/phonetic.expanded": {
+      "default": "./maps/assamese/phonetic.expanded.json"
+    },
+    "./maps/gujarati/phonetic.base": {
+      "default": "./maps/gujarati/phonetic.base.json"
+    },
+    "./maps/gujarati/phonetic.expanded": {
+      "default": "./maps/gujarati/phonetic.expanded.json"
+    },
+    "./maps/punjabi/phonetic.base": {
+      "default": "./maps/punjabi/phonetic.base.json"
+    },
+    "./maps/punjabi/phonetic.expanded": {
+      "default": "./maps/punjabi/phonetic.expanded.json"
+    },
+    "./maps/tamil/phonetic.base": {
+      "default": "./maps/tamil/phonetic.base.json"
+    },
+    "./maps/tamil/phonetic.expanded": {
+      "default": "./maps/tamil/phonetic.expanded.json"
+    },
+    "./maps/telugu/phonetic.base": {
+      "default": "./maps/telugu/phonetic.base.json"
+    },
+    "./maps/telugu/phonetic.expanded": {
+      "default": "./maps/telugu/phonetic.expanded.json"
+    },
+    "./maps/kannada/phonetic.base": {
+      "default": "./maps/kannada/phonetic.base.json"
+    },
+    "./maps/kannada/phonetic.expanded": {
+      "default": "./maps/kannada/phonetic.expanded.json"
+    },
+    "./maps/malayalam/phonetic.base": {
+      "default": "./maps/malayalam/phonetic.base.json"
+    },
+    "./maps/malayalam/phonetic.expanded": {
+      "default": "./maps/malayalam/phonetic.expanded.json"
+    },
+    "./maps/odia/phonetic.base": {
+      "default": "./maps/odia/phonetic.base.json"
+    },
+    "./maps/odia/phonetic.expanded": {
+      "default": "./maps/odia/phonetic.expanded.json"
+    },
+    "./maps/nepali/phonetic.base": {
+      "default": "./maps/nepali/phonetic.base.json"
+    },
+    "./maps/nepali/phonetic.expanded": {
+      "default": "./maps/nepali/phonetic.expanded.json"
+    },
+    "./maps/sanskrit/phonetic.base": {
+      "default": "./maps/sanskrit/phonetic.base.json"
+    },
+    "./maps/sanskrit/phonetic.expanded": {
+      "default": "./maps/sanskrit/phonetic.expanded.json"
+    },
     "./wasm/*": {
       "default": "./dist/wasm/*"
     },
@@ -73,7 +139,7 @@
     "build:all": "npm run build:with-wasm",
     "test": "vitest",
     "test:run": "vitest run",
-    "test:wasm:parity": "vitest run tests/wasm-engine.parity.test.ts",
+    "test:wasm:parity": "vitest run tests/wasm/wasm-engine.parity.test.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "bench:baseline": "npm run rust:wasm:package:release && npm run build && node --expose-gc tools/benchmark-engines.mjs --out docs/perf/baseline.latest.json",
     "bench:run": "npm run rust:wasm:package:release && node --expose-gc tools/benchmark-engines.mjs --out docs/perf/baseline.latest.json",
@@ -92,9 +158,11 @@
     "rust:check:wasm": "cargo check --manifest-path rust-core/Cargo.toml --target wasm32-unknown-unknown",
     "rust:verify": "npm run rust:build && npm run rust:test && npm run rust:wasm:package && npm run rust:check:wasm && npm run test:wasm:parity",
     "generate-map": "node tools/generate-map.js",
+    "generate-map:all-languages": "node tools/generate-language-maps-from-common-maps.mjs",
     "print-inventory": "node tools/print-inventory.js"
   },
   "devDependencies": {
+    "@indic-transliteration/common_maps": "1.0.5",
     "jsdom": "^28.0.0",
     "tsup": "8.5.0",
     "typescript": "5.8.2",

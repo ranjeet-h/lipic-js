@@ -1,8 +1,8 @@
 import { buildTrie, walkLongest, type TrieNode } from "./trie";
 import { createInputStack } from "./input-stack";
 import { runRulePipeline } from "./rules";
+import { getScriptRuleConfig, inferScriptRuleConfig } from "./rules/script-config";
 import type { EngineRuleOptions, NasalizationMode, RuleContext, Token } from "./rules/types";
-import { HALANT } from "./rules/types";
 
 export type Edit = { backspace: number; insert: string };
 
@@ -21,6 +21,8 @@ export interface TransliterationEngineOptions {
     enableLigatureCollapse?: boolean;
     enableSchwaDeletion?: boolean;
   };
+  scriptId?: string;
+  languageId?: string;
 }
 
 export interface TransliterationEngine {
@@ -92,7 +94,7 @@ function renderEntryToTokens(entry: TransliterationEntry, context: ContextState)
   return { tokens: [{ kind: "raw", text: entry.glyph }], context };
 }
 
-function insertHalants(tokens: Token[]): Token[] {
+function insertHalants(tokens: Token[], halant: string): Token[] {
   const out: Token[] = [];
 
   for (let i = 0; i < tokens.length; i += 1) {
@@ -106,7 +108,7 @@ function insertHalants(tokens: Token[]): Token[] {
     }
 
     if (next && isConsonantToken(next)) {
-      out.push({ kind: "halant", glyph: HALANT });
+      out.push({ kind: "halant", glyph: halant });
     }
   }
 
@@ -115,7 +117,8 @@ function insertHalants(tokens: Token[]): Token[] {
 
 function tokenizeBuffer(
   buffer: string,
-  trie: TrieNode<TransliterationEntry>
+  trie: TrieNode<TransliterationEntry>,
+  halant: string
 ): Token[] {
   const rawTokens: Token[] = [];
   let index = 0;
@@ -153,7 +156,7 @@ function tokenizeBuffer(
     index += 1;
   }
 
-  return insertHalants(rawTokens);
+  return insertHalants(rawTokens, halant);
 }
 
 function stringifyTokens(tokens: Token[]): string {
@@ -175,15 +178,59 @@ function stringifyTokens(tokens: Token[]): string {
   return out;
 }
 
+const SCRIPT_UNICODE_RANGES: Record<string, [number, number]> = {
+  devanagari: [0x0900, 0x097F],
+  bengali: [0x0980, 0x09FF],
+  gurmukhi: [0x0A00, 0x0A7F],
+  gujarati: [0x0A80, 0x0AFF],
+  odia: [0x0B00, 0x0B7F],
+  tamil: [0x0B80, 0x0BFF],
+  telugu: [0x0C00, 0x0C7F],
+  kannada: [0x0C80, 0x0CFF],
+  malayalam: [0x0D00, 0x0D7F],
+};
+
+function enforceScriptSafety(rendered: string, raw: string, ruleContext: RuleContext): string {
+  if (ruleContext.script.kind === "devanagari") {
+    return rendered;
+  }
+
+  let candidate = rendered;
+  if (ruleContext.script.nukta) {
+    candidate = candidate.replace(/\u093C/gu, ruleContext.script.nukta);
+  } else {
+    candidate = candidate.replace(/\u093C/gu, "");
+  }
+
+  const expectedRange = SCRIPT_UNICODE_RANGES[ruleContext.script.scriptId];
+  if (expectedRange) {
+    for (let i = 0; i < candidate.length; i++) {
+      const cp = candidate.codePointAt(i)!;
+      if (cp >= 0x0900 && cp <= 0x0DFF) {
+        if (cp < expectedRange[0] || cp > expectedRange[1]) {
+          return raw;
+        }
+      }
+    }
+  } else {
+    if (/[\u0900-\u097F]/u.test(candidate)) {
+      return raw;
+    }
+  }
+
+  return candidate;
+}
+
 function computeRendered(
   raw: string,
   trie: TrieNode<TransliterationEntry>,
-  ruleOptions: EngineRuleOptions
+  ruleOptions: EngineRuleOptions,
+  ruleContext: RuleContext
 ): string {
-  const baseTokens = tokenizeBuffer(raw, trie);
-  const ctx: RuleContext = { options: ruleOptions };
+  const baseTokens = tokenizeBuffer(raw, trie, ruleContext.script.halant);
+  const ctx: RuleContext = { options: ruleOptions, script: ruleContext.script, languageId: ruleContext.languageId };
   const postProcessedTokens = runRulePipeline(baseTokens, ctx);
-  return stringifyTokens(postProcessedTokens);
+  return enforceScriptSafety(stringifyTokens(postProcessedTokens), raw, ruleContext);
 }
 
 export function createTransliterationEngine(options: TransliterationEngineOptions): TransliterationEngine {
@@ -192,12 +239,14 @@ export function createTransliterationEngine(options: TransliterationEngineOption
     ...DEFAULT_RULES,
     ...(options.rules ?? {})
   };
+  const scriptConfig = (options.scriptId ? getScriptRuleConfig(options.scriptId) : null) ?? inferScriptRuleConfig(options.expandedMap);
+  const ruleContext: RuleContext = { options: ruleOptions, script: scriptConfig, languageId: options.languageId };
   const inputStack = createInputStack();
 
   let renderedBuffer = "";
 
   function rewriteFromCurrentInput(): Edit {
-    const nextRendered = computeRendered(inputStack.toString(), trie, ruleOptions);
+    const nextRendered = computeRendered(inputStack.toString(), trie, ruleOptions, ruleContext);
     const edit: Edit = {
       backspace: renderedBuffer.length,
       insert: nextRendered
@@ -231,7 +280,7 @@ export function createTransliterationEngine(options: TransliterationEngineOption
           result += chunk;
         } else {
           // Transliterate the chunk
-          result += computeRendered(chunk, trie, ruleOptions);
+          result += computeRendered(chunk, trie, ruleOptions, ruleContext);
         }
       }
       
