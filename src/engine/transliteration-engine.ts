@@ -25,6 +25,7 @@ export interface TransliterationEngineOptions {
 
 export interface TransliterationEngine {
   processChar(char: string): Edit;
+  processText(text: string): Edit;
   backspace(): Edit;
   commit(): Edit;
   reset(): void;
@@ -201,6 +202,28 @@ export function createTransliterationEngine(options: TransliterationEngineOption
 
       inputStack.push(char);
       return rewriteFromCurrentInput();
+    },
+    processText(text: string): Edit {
+      // For pasted text, we transliterate the entire string at once
+      // Clear current buffer and process the full text
+      inputStack.clear();
+      
+      // Split by separators and process each chunk
+      const chunks = text.split(/(\s+|[.,!?;:()[\]{}'"-])/);
+      let result = "";
+      
+      for (const chunk of chunks) {
+        if (isSeparator(chunk) || chunk === "") {
+          result += chunk;
+        } else {
+          // Transliterate the chunk
+          result += computeRendered(chunk, trie, ruleOptions);
+        }
+      }
+      
+      const edit: Edit = { backspace: renderedBuffer.length, insert: result };
+      renderedBuffer = result;
+      return edit;
     },
     backspace(): Edit {
       if (inputStack.isEmpty()) {

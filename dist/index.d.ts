@@ -438,6 +438,11 @@ var e = {
 	glyph: "ए",
 	matra: "े"
 };
+var ee = {
+	type: "vowel",
+	glyph: "ई",
+	matra: "ी"
+};
 var g = {
 	type: "consonant",
 	glyph: "ग"
@@ -542,6 +547,10 @@ var r = {
 	type: "consonant",
 	glyph: "र"
 };
+var R = {
+	type: "consonant",
+	glyph: "र"
+};
 var ri = {
 	type: "vowel",
 	glyph: "ऋ",
@@ -594,6 +603,14 @@ var v = {
 	type: "consonant",
 	glyph: "व"
 };
+var w = {
+	type: "consonant",
+	glyph: "व"
+};
+var W = {
+	type: "consonant",
+	glyph: "व"
+};
 var x = {
 	type: "conjunct",
 	glyph: "क्ष"
@@ -601,6 +618,76 @@ var x = {
 var y = {
 	type: "consonant",
 	glyph: "य"
+};
+var B = {
+	type: "consonant",
+	glyph: "ब"
+};
+var G = {
+	type: "consonant",
+	glyph: "ग"
+};
+var J = {
+	type: "consonant",
+	glyph: "ज"
+};
+var K = {
+	type: "consonant",
+	glyph: "क"
+};
+var P = {
+	type: "consonant",
+	glyph: "प"
+};
+var V = {
+	type: "consonant",
+	glyph: "व"
+};
+var X = {
+	type: "conjunct",
+	glyph: "क्ष"
+};
+var Y = {
+	type: "consonant",
+	glyph: "य"
+};
+var E = {
+	type: "vowel",
+	glyph: "ए",
+	matra: "े"
+};
+var O = {
+	type: "vowel",
+	glyph: "ओ",
+	matra: "ो"
+};
+var Ch = {
+	type: "consonant",
+	glyph: "च"
+};
+var Ph = {
+	type: "consonant",
+	glyph: "फ"
+};
+var Bh = {
+	type: "consonant",
+	glyph: "भ"
+};
+var Gh = {
+	type: "consonant",
+	glyph: "घ"
+};
+var Kh = {
+	type: "consonant",
+	glyph: "ख"
+};
+var Ny = {
+	type: "consonant",
+	glyph: "ञ"
+};
+var Ng = {
+	type: "consonant",
+	glyph: "ङ"
 };
 var phonetic_expanded = {
 	a: a,
@@ -625,6 +712,7 @@ var phonetic_expanded = {
 	Dh: Dh,
 	dny: dny,
 	e: e,
+	ee: ee,
 	g: g,
 	gh: gh,
 	gy: gy,
@@ -655,6 +743,7 @@ var phonetic_expanded = {
 	p: p,
 	ph: ph,
 	r: r,
+	R: R,
 	ri: ri,
 	s: s,
 	sh: sh,
@@ -672,8 +761,27 @@ var phonetic_expanded = {
 },
 	uu: uu,
 	v: v,
+	w: w,
+	W: W,
 	x: x,
-	y: y
+	y: y,
+	B: B,
+	G: G,
+	J: J,
+	K: K,
+	P: P,
+	V: V,
+	X: X,
+	Y: Y,
+	E: E,
+	O: O,
+	Ch: Ch,
+	Ph: Ph,
+	Bh: Bh,
+	Gh: Gh,
+	Kh: Kh,
+	Ny: Ny,
+	Ng: Ng
 };
 
 interface TrieNode<TValue> {
@@ -732,6 +840,7 @@ interface TransliterationEngineOptions {
 }
 interface TransliterationEngine {
     processChar(char: string): Edit$1;
+    processText(text: string): Edit$1;
     backspace(): Edit$1;
     commit(): Edit$1;
     reset(): void;
@@ -1095,6 +1204,11 @@ declare const maps: {
                     glyph: string;
                     matra: string;
                 };
+                ee: {
+                    type: string;
+                    glyph: string;
+                    matra: string;
+                };
                 g: {
                     type: string;
                     glyph: string;
@@ -1204,6 +1318,10 @@ declare const maps: {
                     type: string;
                     glyph: string;
                 };
+                R: {
+                    type: string;
+                    glyph: string;
+                };
                 ri: {
                     type: string;
                     glyph: string;
@@ -1261,11 +1379,89 @@ declare const maps: {
                     type: string;
                     glyph: string;
                 };
+                w: {
+                    type: string;
+                    glyph: string;
+                };
+                W: {
+                    type: string;
+                    glyph: string;
+                };
                 x: {
                     type: string;
                     glyph: string;
                 };
                 y: {
+                    type: string;
+                    glyph: string;
+                };
+                B: {
+                    type: string;
+                    glyph: string;
+                };
+                G: {
+                    type: string;
+                    glyph: string;
+                };
+                J: {
+                    type: string;
+                    glyph: string;
+                };
+                K: {
+                    type: string;
+                    glyph: string;
+                };
+                P: {
+                    type: string;
+                    glyph: string;
+                };
+                V: {
+                    type: string;
+                    glyph: string;
+                };
+                X: {
+                    type: string;
+                    glyph: string;
+                };
+                Y: {
+                    type: string;
+                    glyph: string;
+                };
+                E: {
+                    type: string;
+                    glyph: string;
+                    matra: string;
+                };
+                O: {
+                    type: string;
+                    glyph: string;
+                    matra: string;
+                };
+                Ch: {
+                    type: string;
+                    glyph: string;
+                };
+                Ph: {
+                    type: string;
+                    glyph: string;
+                };
+                Bh: {
+                    type: string;
+                    glyph: string;
+                };
+                Gh: {
+                    type: string;
+                    glyph: string;
+                };
+                Kh: {
+                    type: string;
+                    glyph: string;
+                };
+                Ny: {
+                    type: string;
+                    glyph: string;
+                };
+                Ng: {
                     type: string;
                     glyph: string;
                 };

@@ -142,7 +142,8 @@ export function createInputInterceptor(options: InputInterceptorOptions): InputI
       return;
     }
 
-    const edit = engine.processChar(text);
+    // Use processText for multi-character input (paste), processChar for single character
+    const edit = text.length > 1 ? engine.processText(text) : engine.processChar(text);
     if (!applyEdit(edit)) {
       return;
     }

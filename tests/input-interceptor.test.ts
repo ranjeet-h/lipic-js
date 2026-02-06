@@ -174,4 +174,145 @@ describe("input interceptor", () => {
 
     interceptor.detach();
   });
+
+  describe("uppercase and paste support", () => {
+    it("handles uppercase character input", () => {
+      const el = document.createElement("textarea");
+      document.body.appendChild(el);
+      el.value = "";
+      el.setSelectionRange(0, 0);
+
+      const engine = createTransliterationEngine({ expandedMap: marathiExpanded });
+      const interceptor = createInputInterceptor({ element: el, engine });
+      interceptor.attach();
+
+      // Test uppercase R
+      const evt1 = beforeInput(el, "R");
+      expect(evt1.defaultPrevented).toBe(true);
+      expect(el.value).toBe("र");
+
+      // Test uppercase A
+      const evt2 = beforeInput(el, "A");
+      expect(evt2.defaultPrevented).toBe(true);
+      expect(el.value).toBe("रा");
+
+      interceptor.detach();
+    });
+
+    it("handles multi-character paste input", () => {
+      const el = document.createElement("textarea");
+      document.body.appendChild(el);
+      el.value = "";
+      el.setSelectionRange(0, 0);
+
+      const engine = createTransliterationEngine({ expandedMap: marathiExpanded });
+      const interceptor = createInputInterceptor({ element: el, engine });
+      interceptor.attach();
+
+      // Simulate pasting multi-character text
+      const evt = beforeInput(el, "namaste");
+      expect(evt.defaultPrevented).toBe(true);
+      expect(el.value).toBe("नमस्ते");
+
+      interceptor.detach();
+    });
+
+    it("handles mixed case paste input", () => {
+      const el = document.createElement("textarea");
+      document.body.appendChild(el);
+      el.value = "";
+      el.setSelectionRange(0, 0);
+
+      const engine = createTransliterationEngine({ expandedMap: marathiExpanded });
+      const interceptor = createInputInterceptor({ element: el, engine });
+      interceptor.attach();
+
+      // Simulate pasting mixed case text
+      const evt = beforeInput(el, "My Name is RANJEET");
+      expect(evt.defaultPrevented).toBe(true);
+      const expected = createTransliterationEngine({ expandedMap: marathiExpanded })
+        .processText("My Name is RANJEET").insert;
+      expect(el.value).toBe(expected);
+
+      interceptor.detach();
+    });
+
+    it("handles paste with punctuation and spaces", () => {
+      const el = document.createElement("textarea");
+      document.body.appendChild(el);
+      el.value = "";
+      el.setSelectionRange(0, 0);
+
+      const engine = createTransliterationEngine({ expandedMap: marathiExpanded });
+      const interceptor = createInputInterceptor({ element: el, engine });
+      interceptor.attach();
+
+      // Simulate pasting text with punctuation
+      const evt = beforeInput(el, "hello, world!");
+      expect(evt.defaultPrevented).toBe(true);
+      const expected = createTransliterationEngine({ expandedMap: marathiExpanded })
+        .processText("hello, world!").insert;
+      expect(el.value).toBe(expected);
+
+      interceptor.detach();
+    });
+
+    it("distinguishes between single char and multi-char input", () => {
+      const el = document.createElement("textarea");
+      document.body.appendChild(el);
+      el.value = "";
+      el.setSelectionRange(0, 0);
+
+      const engine = createTransliterationEngine({ expandedMap: marathiExpanded });
+      const processCharSpy = vi.spyOn(engine, "processChar");
+      const processTextSpy = vi.spyOn(engine, "processText");
+      const interceptor = createInputInterceptor({ element: el, engine });
+      interceptor.attach();
+
+      // Single character should use processChar
+      beforeInput(el, "k");
+      expect(processCharSpy).toHaveBeenCalledWith("k");
+      expect(processTextSpy).not.toHaveBeenCalled();
+
+      // Multi-character should use processText
+      beforeInput(el, "hello");
+      expect(processTextSpy).toHaveBeenCalledWith("hello");
+
+      interceptor.detach();
+    });
+
+    it("handles typing followed by paste", () => {
+      const el = document.createElement("textarea");
+      document.body.appendChild(el);
+      el.value = "";
+      el.setSelectionRange(0, 0);
+
+      const engine = createTransliterationEngine({ expandedMap: marathiExpanded });
+      const interceptor = createInputInterceptor({ element: el, engine });
+      interceptor.attach();
+
+      // Type some characters
+      beforeInput(el, "M");
+      beforeInput(el, "y");
+      const expectedTyped = (() => {
+        const e = createTransliterationEngine({ expandedMap: marathiExpanded });
+        let host = "";
+        const apply = (edit: { backspace: number; insert: string }) =>
+          `${host.slice(0, Math.max(0, host.length - edit.backspace))}${edit.insert}`;
+        host = apply(e.processChar("M"));
+        host = apply(e.processChar("y"));
+        return host;
+      })();
+      expect(el.value).toBe(expectedTyped);
+
+      // Paste additional text
+      const evt = beforeInput(el, " friend");
+      expect(evt.defaultPrevented).toBe(true);
+      const expectedAfterPaste = createTransliterationEngine({ expandedMap: marathiExpanded })
+        .processText(" friend").insert;
+      expect(el.value).toBe(expectedAfterPaste);
+
+      interceptor.detach();
+    });
+  });
 });

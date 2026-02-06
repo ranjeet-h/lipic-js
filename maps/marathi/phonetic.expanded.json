@@ -80,6 +80,11 @@
     "glyph": "ए",
     "matra": "े"
   },
+  "ee": {
+    "type": "vowel",
+    "glyph": "ई",
+    "matra": "ी"
+  },
   "g": {
     "type": "consonant",
     "glyph": "ग"
@@ -189,6 +194,10 @@
     "type": "consonant",
     "glyph": "र"
   },
+  "R": {
+    "type": "consonant",
+    "glyph": "र"
+  },
   "ri": {
     "type": "vowel",
     "glyph": "ऋ",
@@ -246,6 +255,14 @@
     "type": "consonant",
     "glyph": "व"
   },
+  "w": {
+    "type": "consonant",
+    "glyph": "व"
+  },
+  "W": {
+    "type": "consonant",
+    "glyph": "व"
+  },
   "x": {
     "type": "conjunct",
     "glyph": "क्ष"
@@ -253,5 +270,75 @@
   "y": {
     "type": "consonant",
     "glyph": "य"
+  },
+  "B": {
+    "type": "consonant",
+    "glyph": "ब"
+  },
+  "G": {
+    "type": "consonant",
+    "glyph": "ग"
+  },
+  "J": {
+    "type": "consonant",
+    "glyph": "ज"
+  },
+  "K": {
+    "type": "consonant",
+    "glyph": "क"
+  },
+  "P": {
+    "type": "consonant",
+    "glyph": "प"
+  },
+  "V": {
+    "type": "consonant",
+    "glyph": "व"
+  },
+  "X": {
+    "type": "conjunct",
+    "glyph": "क्ष"
+  },
+  "Y": {
+    "type": "consonant",
+    "glyph": "य"
+  },
+  "E": {
+    "type": "vowel",
+    "glyph": "ए",
+    "matra": "े"
+  },
+  "O": {
+    "type": "vowel",
+    "glyph": "ओ",
+    "matra": "ो"
+  },
+  "Ch": {
+    "type": "consonant",
+    "glyph": "च"
+  },
+  "Ph": {
+    "type": "consonant",
+    "glyph": "फ"
+  },
+  "Bh": {
+    "type": "consonant",
+    "glyph": "भ"
+  },
+  "Gh": {
+    "type": "consonant",
+    "glyph": "घ"
+  },
+  "Kh": {
+    "type": "consonant",
+    "glyph": "ख"
+  },
+  "Ny": {
+    "type": "consonant",
+    "glyph": "ञ"
+  },
+  "Ng": {
+    "type": "consonant",
+    "glyph": "ङ"
   }
 }
