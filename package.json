@@ -35,13 +35,16 @@
   "jsdelivr": "./dist/indic-ime.iife.js",
   "scripts": {
     "build": "tsup",
+    "test": "vitest",
+    "test:run": "vitest run",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "generate-map": "node tools/generate-map.js",
     "print-inventory": "node tools/print-inventory.js"
   },
   "devDependencies": {
+    "jsdom": "^28.0.0",
     "tsup": "8.5.0",
-    "typescript": "5.8.2"
+    "typescript": "5.8.2",
+    "vitest": "3.2.4"
   }
 }
-

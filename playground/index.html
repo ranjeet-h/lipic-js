@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Indic IME Playground</title>
+    <style>
+      body { font-family: sans-serif; margin: 16px; }
+      label { display: block; margin-top: 12px; }
+      textarea, input, [contenteditable] { width: 100%; max-width: 720px; padding: 8px; margin-top: 6px; }
+      [contenteditable] { border: 1px solid #aaa; min-height: 80px; }
+      small { color: #555; }
+    </style>
+  </head>
+  <body>
+    <h1>Indic IME Playground</h1>
+
+    <label>
+      Language (UI-only)
+      <select id="language">
+        <option value="marathi" selected>Marathi (phonetic)</option>
+        <option value="hindi">Hindi (placeholder)</option>
+      </select>
+    </label>
+
+    <label>
+      Textarea
+      <textarea id="ta" rows="4" placeholder="Type here..."></textarea>
+    </label>
+
+    <label>
+      Input[type=text]
+      <input id="txt" type="text" placeholder="Type here..." />
+    </label>
+
+    <label>
+      Contenteditable
+      <div id="ce" contenteditable="true" role="textbox" aria-multiline="true"></div>
+    </label>
+
+    <p><small>Language selector is UI-only in this milestone.</small></p>
+
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>

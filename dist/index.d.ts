@@ -676,6 +676,107 @@ var phonetic_expanded = {
 	y: y
 };
 
+interface TrieNode<TValue> {
+    children: Map<string, TrieNode<TValue>>;
+    terminal: null | {
+        key: string;
+        value: TValue;
+    };
+}
+interface LongestMatchResult<TValue> {
+    isPrefix: boolean;
+    matched: boolean;
+    key: string;
+    value: TValue | null;
+    length: number;
+}
+declare function buildTrie<TValue>(expandedMap: Record<string, TValue>): TrieNode<TValue>;
+declare function walkLongest<TValue>(root: TrieNode<TValue>, input: string, startIndex?: number): LongestMatchResult<TValue>;
+
+interface InputStack {
+    push(char: string): void;
+    pop(): string | undefined;
+    clear(): void;
+    toString(): string;
+    size(): number;
+    isEmpty(): boolean;
+}
+declare function createInputStack(): InputStack;
+
+type NasalizationMode = "anusvara" | "panchamakshar";
+interface EngineRuleOptions {
+    enableNukta: boolean;
+    nasalizationMode: NasalizationMode;
+    enableLigatureCollapse: boolean;
+    enableSchwaDeletion: boolean;
+}
+
+type Edit$1 = {
+    backspace: number;
+    insert: string;
+};
+interface TransliterationEntry {
+    type: string;
+    glyph: string;
+    matra?: string;
+}
+interface TransliterationEngineOptions {
+    expandedMap: Record<string, TransliterationEntry>;
+    trie?: TrieNode<TransliterationEntry>;
+    rules?: {
+        enableNukta?: boolean;
+        nasalizationMode?: NasalizationMode;
+        enableLigatureCollapse?: boolean;
+        enableSchwaDeletion?: boolean;
+    };
+}
+interface TransliterationEngine {
+    processChar(char: string): Edit$1;
+    backspace(): Edit$1;
+    commit(): Edit$1;
+    reset(): void;
+}
+declare function createTransliterationEngine(options: TransliterationEngineOptions): TransliterationEngine;
+
+type TextInputLike = HTMLInputElement | HTMLTextAreaElement;
+declare function deleteAndInsert(el: TextInputLike, backspace: number, insert: string): {
+    start: number;
+    end: number;
+};
+declare class DOMIntegrator {
+    private readonly element?;
+    constructor(element?: TextInputLike);
+    deleteAndInsert(el: TextInputLike, backspace: number, insert: string): {
+        start: number;
+        end: number;
+    };
+    deleteAndInsert(backspace: number, insert: string): {
+        start: number;
+        end: number;
+    };
+}
+
+type InterceptTarget = TextInputLike | HTMLElement;
+interface InputInterceptorOptions {
+    element: InterceptTarget;
+    engine: TransliterationEngine;
+    enabled?: boolean;
+    onEditApplied?: (edit: Edit$1) => void;
+    onBypass?: (reason: "disabled" | "modifier" | "composition" | "unsupported-target" | "selection") => void;
+}
+interface InputInterceptor {
+    attach(): void;
+    detach(): void;
+    isAttached(): boolean;
+}
+declare function createInputInterceptor(options: InputInterceptorOptions): InputInterceptor;
+
+interface ContentEditableEditResult {
+    collapsed: boolean;
+    applied: boolean;
+}
+declare function deleteAndInsertContentEditable(root: HTMLElement, backspace: number, insert: string): ContentEditableEditResult;
+
 type Edit = {
     backspace: number;
     insert: string;
@@ -1173,4 +1274,4 @@ declare const maps: {
     };
 };
 
-export { type Edit, base as devanagariBase, maps, phonetic_base as marathiPhoneticBase, phonetic_expanded as marathiPhoneticExpanded };
+export { type ContentEditableEditResult, DOMIntegrator, type Edit, type EngineRuleOptions, type InputInterceptor, type InputInterceptorOptions, type InputStack, type InterceptTarget, type LongestMatchResult, type NasalizationMode, type TextInputLike, type TransliterationEngine, type TransliterationEngineOptions, type TransliterationEntry, type TrieNode, buildTrie, createInputInterceptor, createInputStack, createTransliterationEngine, deleteAndInsert, deleteAndInsertContentEditable, base as devanagariBase, maps, phonetic_base as marathiPhoneticBase, phonetic_expanded as marathiPhoneticExpanded, walkLongest };
