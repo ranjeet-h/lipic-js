@@ -1,6 +1,6 @@
 {
-  "name": "lipic-js",
-  "version": "0.1.0",
+  "name": "@ranjeet-h/lipic-js",
+  "version": "0.0.1",
   "description": "lipic-js transliteration building blocks (data-first)",
   "license": "MIT",
   "type": "module",
@@ -167,5 +167,9 @@
     "tsup": "8.5.0",
     "typescript": "5.8.2",
     "vitest": "3.2.4"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ranjeet-h/lipic-js.git"
   }
 }
