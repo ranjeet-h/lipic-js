@@ -31,20 +31,13 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Prepare deploy directory
-        run: |
-          mkdir -p _site/playground _site/dist
-          cp -r playground/* _site/playground/
-          cp -r dist/* _site/dist/
-          cp _site/playground/index.html _site/index.html
-
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./_site
+          path: .
 
       - name: Deploy to GitHub Pages
         id: deployment
