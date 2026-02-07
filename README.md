@@ -4,7 +4,7 @@
 
 Fast transliteration for web text inputs (`input`, `textarea`, `contenteditable`) with a JS/WASM hybrid runtime.
 
-[![npm](https://img.shields.io/npm/v/%40ranjeet-h%2Flipic-js?label=npm)](https://www.npmjs.com/package/@ranjeet-h/lipic-js)
+[![npm](https://img.shields.io/npm/v/%40ranjeet-h%2Flipic-js?label=npm)](https://www.npmjs.com/package/lipic-js)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8+-3178c6.svg)](https://www.typescriptlang.org/)
 [![Playground](https://img.shields.io/badge/Playground-Live-22c55e.svg)](https://ranjeet-h.github.io/lipic-js/playground/)
@@ -100,7 +100,7 @@ const session = await enableTransliteration({
 ### 2. CDN (Script Tag)
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/@ranjeet-h/lipic-js/dist/lipic-js.iife.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lipic-js@1.1.1/dist/lipic-js.iife.min.js"></script>
 <script>
   // API is exposed as window.LipicJS
   (async () => {
