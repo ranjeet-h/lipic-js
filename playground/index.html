@@ -4,63 +4,469 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>lipic-js Playground</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
-      body { font-family: sans-serif; margin: 16px; }
-      label { display: block; margin-top: 12px; }
-      textarea, input, [contenteditable] { width: 100%; max-width: 720px; padding: 8px; margin-top: 6px; }
-      [contenteditable] { border: 1px solid #aaa; min-height: 80px; }
-      small { color: #555; }
+      :root {
+        --bg-primary: #faf8f5;
+        --bg-secondary: #f5f2ed;
+        --accent-primary: #d97706;
+        --accent-secondary: #f59e0b;
+        --text-primary: #1c1917;
+        --text-secondary: #57534e;
+        --border-color: #e7e5e4;
+        --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.04);
+        --shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.08);
+        --control-height: 46px;
+        --editor-min-height: 120px;
+        --keystroke-min-height: 40px;
+        --card-padding: 14px;
+        --layout-gap: 14px;
+        --field-pad-y: 10px;
+        --field-pad-x: 12px;
+        --field-font-size: 14px;
+        --label-font-size: 12px;
+        --title-size: 30px;
+        --section-title-size: 20px;
+        --counter-size: 11px;
+        --button-pad-y: 9px;
+        --button-pad-x: 14px;
+        --button-font-size: 14px;
+      }
+      
+      body {
+        font-family: 'DM Sans', sans-serif;
+        background: var(--bg-primary);
+        color: var(--text-primary);
+        min-height: 100vh;
+      }
+      
+      .font-display {
+        font-family: 'Playfair Display', serif;
+      }
+      
+      .gradient-text {
+        background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+      
+      .card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: var(--shadow-soft);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid var(--border-color);
+      }
+
+      .card-pad {
+        padding: var(--card-padding);
+      }
+      
+      .card:hover {
+        box-shadow: var(--shadow-hover);
+        transform: translateY(-2px);
+      }
+      
+      .input-field {
+        width: 100%;
+        padding: var(--field-pad-y) var(--field-pad-x);
+        border: 2px solid var(--border-color);
+        border-radius: 12px;
+        font-size: var(--field-font-size);
+        line-height: 1.6;
+        transition: all 0.2s ease;
+        background: var(--bg-secondary);
+        color: var(--text-primary);
+      }
+
+      .control-height {
+        min-height: var(--control-height);
+      }
+
+      .editor-surface {
+        min-height: var(--editor-min-height);
+      }
+
+      .keystroke-surface {
+        min-height: var(--keystroke-min-height);
+        display: flex;
+        align-items: center;
+      }
+
+      .app-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: var(--layout-gap);
+      }
+
+      .main-area,
+      .sidebar-area {
+        min-width: 0;
+      }
+      
+      .input-field:focus {
+        outline: none;
+        border-color: var(--accent-primary);
+        background: white;
+        box-shadow: 0 0 0 4px rgba(217, 119, 6, 0.1);
+      }
+      
+      .input-field::placeholder {
+        color: #a8a29e;
+      }
+      
+      .select-field {
+        width: 100%;
+        padding: var(--field-pad-y) var(--field-pad-x);
+        border: 2px solid var(--border-color);
+        border-radius: 12px;
+        font-size: var(--field-font-size);
+        font-weight: 500;
+        transition: all 0.2s ease;
+        background: white;
+        color: var(--text-primary);
+        cursor: pointer;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2378716c'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 16px center;
+        background-size: 20px;
+      }
+      
+      .select-field:focus {
+        outline: none;
+        border-color: var(--accent-primary);
+        box-shadow: 0 0 0 4px rgba(217, 119, 6, 0.1);
+      }
+      
+      .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        background: linear-gradient(135deg, rgba(217, 119, 6, 0.1) 0%, rgba(245, 158, 11, 0.1) 100%);
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--accent-primary);
+      }
+      
+      .status-dot {
+        width: 8px;
+        height: 8px;
+        background: var(--accent-primary);
+        border-radius: 50%;
+        animation: pulse 2s infinite;
+      }
+      
+      @keyframes pulse {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.6; transform: scale(1.1); }
+      }
+      
+      .info-text {
+        color: var(--text-secondary);
+        font-size: 14px;
+        line-height: 1.7;
+      }
+      
+      .section-label {
+        font-size: var(--label-font-size);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: #a8a29e;
+        margin-bottom: 12px;
+      }
+
+      .hero-title {
+        font-size: var(--title-size);
+      }
+
+      .card-title {
+        font-size: var(--section-title-size);
+      }
+
+      .counter-text {
+        font-size: var(--counter-size);
+      }
+
+      .clear-btn {
+        padding: var(--button-pad-y) var(--button-pad-x);
+        font-size: var(--button-font-size);
+      }
+      
+      .decorative-line {
+        width: 60px;
+        height: 3px;
+        background: linear-gradient(90deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+        border-radius: 2px;
+        margin-bottom: 24px;
+      }
+      
+      [contenteditable]:empty:before {
+        content: attr(data-placeholder);
+        color: #a8a29e;
+        pointer-events: none;
+      }
+      
+      .fade-in {
+        animation: fadeIn 0.6s ease-out;
+      }
+      
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      
+      .keyboard-key {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 32px;
+        height: 32px;
+        padding: 0 8px;
+        background: linear-gradient(180deg, #ffffff 0%, #f5f2ed 100%);
+        border: 1px solid #e7e5e4;
+        border-radius: 6px;
+        font-family: 'DM Sans', monospace;
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--text-primary);
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+      }
+      
+      [data-placeholder]:empty:before {
+        content: attr(data-placeholder);
+        color: #a8a29e;
+        pointer-events: none;
+      }
+
+      @media (min-width: 640px) {
+        :root {
+          --control-height: 50px;
+          --editor-min-height: 136px;
+          --keystroke-min-height: 42px;
+          --card-padding: 18px;
+          --layout-gap: 18px;
+          --field-pad-y: 12px;
+          --field-pad-x: 16px;
+          --field-font-size: 15px;
+          --label-font-size: 12px;
+          --title-size: 38px;
+          --section-title-size: 22px;
+          --counter-size: 12px;
+          --button-pad-y: 10px;
+          --button-pad-x: 18px;
+          --button-font-size: 15px;
+        }
+      }
+
+      @media (min-width: 1024px) {
+        :root {
+          --control-height: 56px;
+          --editor-min-height: 160px;
+          --keystroke-min-height: 46px;
+          --card-padding: 24px;
+          --layout-gap: 28px;
+          --field-pad-y: 16px;
+          --field-pad-x: 20px;
+          --field-font-size: 16px;
+          --label-font-size: 13px;
+          --title-size: 56px;
+          --section-title-size: 30px;
+          --counter-size: 12px;
+          --button-pad-y: 12px;
+          --button-pad-x: 28px;
+          --button-font-size: 16px;
+        }
+
+        .app-grid {
+          grid-template-columns: minmax(280px, 1fr) minmax(0, 2fr);
+        }
+      }
+
+      @media (max-width: 639px) {
+        .card {
+          border-radius: 14px;
+        }
+
+        .input-field {
+          line-height: 1.5;
+        }
+
+        :root {
+          --editor-min-height: 120px;
+        }
+
+        .status-badge {
+          font-size: 12px;
+          padding: 6px 12px;
+        }
+      }
     </style>
   </head>
-  <body>
-    <h1>lipic-js Playground</h1>
+  <body class="p-4 sm:p-6 lg:p-10">
+    <div class="max-w-6xl mx-auto">
+      <!-- Header -->
+      <header class="mb-8 sm:mb-12 fade-in">
+        <div class="flex items-center gap-3 sm:gap-4 mb-4">
+          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center shadow-lg">
+            <svg class="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
+            </svg>
+          </div>
+          <div>
+            <h1 class="hero-title font-display font-bold gradient-text">lipic-js</h1>
+            <p class="text-stone-500 font-medium mt-1 text-sm sm:text-base">Phonetic Transliteration Playground</p>
+          </div>
+        </div>
+        <div class="decorative-line"></div>
+      </header>
 
-    <label>
-      Language
-      <select id="language">
-        <option value="hi" selected>Hindi (hi)</option>
-        <option value="mr">Marathi (mr)</option>
-        <option value="ne">Nepali (ne)</option>
-        <option value="sa">Sanskrit (sa)</option>
-        <option value="bn">Bengali (bn)</option>
-        <option value="as">Assamese (as)</option>
-        <option value="gu">Gujarati (gu)</option>
-        <option value="pa">Punjabi (pa)</option>
-        <option value="ta">Tamil (ta)</option>
-        <option value="te">Telugu (te)</option>
-        <option value="kn">Kannada (kn)</option>
-        <option value="ml">Malayalam (ml)</option>
-        <option value="or">Odia (or)</option>
-      </select>
-    </label>
+      <div class="app-grid">
+        <!-- Sidebar Controls -->
+        <aside class="sidebar-area space-y-4 sm:space-y-6 fade-in" style="animation-delay: 0.1s;">
+          <div class="card card-pad">
+            <h2 class="card-title font-display font-semibold mb-6 text-stone-800">Configuration</h2>
+            
+            <div class="space-y-5">
+              <div>
+                <label class="section-label">Target Language</label>
+                <select id="language" class="select-field control-height">
+                  <option value="hi" selected>Hindi (हिन्दी)</option>
+                  <option value="mr">Marathi (मराठी)</option>
+                  <option value="ne">Nepali (नेपाली)</option>
+                  <option value="sa">Sanskrit (संस्कृतम्)</option>
+                  <option value="bn">Bengali (বাংলা)</option>
+                  <option value="as">Assamese (অসমীয়া)</option>
+                  <option value="gu">Gujarati (ગુજરાતી)</option>
+                  <option value="pa">Punjabi (ਪੰਜਾਬੀ)</option>
+                  <option value="ta">Tamil (தமிழ்)</option>
+                  <option value="te">Telugu (తెలుగు)</option>
+                  <option value="kn">Kannada (ಕನ್ನಡ)</option>
+                  <option value="ml">Malayalam (മലയാളം)</option>
+                  <option value="or">Odia (ଓଡ଼ିଆ)</option>
+                </select>
+              </div>
+              
+              <div>
+                <label class="section-label">WASM Mode</label>
+                <select id="wasm-mode" class="select-field control-height">
+                  <option value="auto" selected>Auto (prefer WASM, fallback JS)</option>
+                  <option value="true">Force WASM</option>
+                  <option value="false">Force JavaScript</option>
+                </select>
+              </div>
+            </div>
+          </div>
 
-    <label>
-      WASM Mode
-      <select id="wasm-mode">
-        <option value="auto" selected>auto (prefer wasm, fallback js)</option>
-        <option value="true">true (force wasm)</option>
-        <option value="false">false (force js)</option>
-      </select>
-    </label>
+          <!-- Status Panel -->
+          <div class="card card-pad">
+            <h2 class="card-title font-display font-semibold mb-5 text-stone-800">Status</h2>
+            <div class="space-y-4">
+              <div class="status-badge">
+                <span class="status-dot"></span>
+                <span id="lang-note">Loading...</span>
+              </div>
+              <p class="info-text" id="script-note"></p>
+              <p class="info-text text-xs mt-4 pt-4 border-t border-stone-200" id="runtime-note"></p>
+            </div>
+          </div>
 
-    <label>
-      Textarea
-      <textarea id="ta" rows="4" placeholder="Type here..."></textarea>
-    </label>
+          <!-- Keyboard Reference -->
+          <div class="card card-pad">
+            <button onclick="toggleKeyboardRef()" class="w-full flex items-center justify-between mb-4 group">
+              <h2 class="card-title font-display font-semibold text-stone-800">Keyboard Reference</h2>
+              <svg id="keyboard-ref-arrow" class="w-5 h-5 text-stone-400 transform transition-transform group-hover:text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            <div id="keyboard-ref-content" class="hidden space-y-4">
+              <div id="keyboard-ref-vowels" class="space-y-2"></div>
+              <div id="keyboard-ref-consonants" class="space-y-2"></div>
+              <div id="keyboard-ref-marks" class="space-y-2"></div>
+              <div id="keyboard-ref-conjuncts" class="space-y-2"></div>
+            </div>
+          </div>
+        </aside>
 
-    <label>
-      Input[type=text]
-      <input id="txt" type="text" placeholder="Type here..." />
-    </label>
+        <!-- Main Input Area -->
+        <main class="main-area space-y-4 sm:space-y-6 fade-in" style="animation-delay: 0.2s;">
+          <!-- Textarea -->
+          <div class="card card-pad">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="card-title font-display font-semibold text-stone-800">Textarea</h3>
+              <div class="flex items-center gap-3">
+                <span class="counter-text text-stone-400 font-medium" id="ta-counter">0 characters</span>
+                <button onclick="copyToClipboard('ta')" class="p-2 rounded-lg hover:bg-stone-100 transition-colors group" title="Copy to clipboard">
+                  <svg class="w-5 h-5 text-stone-400 group-hover:text-amber-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <div id="ta-keystrokes" class="keystroke-surface mb-3 p-3 bg-amber-50 rounded-lg border border-amber-200 font-mono text-sm text-amber-900 overflow-x-auto" data-placeholder="Your keystrokes will appear here..."></div>
+            <textarea id="ta" rows="5" class="input-field editor-surface resize-none" placeholder="Type here to see transliteration..."></textarea>
+          </div>
 
-    <label>
-      Contenteditable
-      <div id="ce" contenteditable="true" role="textbox" aria-multiline="true"></div>
-    </label>
+          <!-- Input Field -->
+          <div class="card card-pad">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="card-title font-display font-semibold text-stone-800">Input Field</h3>
+              <div class="flex items-center gap-3">
+                <span class="counter-text text-stone-400 font-medium" id="txt-counter">0 characters</span>
+                <button onclick="copyToClipboard('txt')" class="p-2 rounded-lg hover:bg-stone-100 transition-colors group" title="Copy to clipboard">
+                  <svg class="w-5 h-5 text-stone-400 group-hover:text-amber-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <div id="txt-keystrokes" class="keystroke-surface mb-3 p-3 bg-amber-50 rounded-lg border border-amber-200 font-mono text-sm text-amber-900 overflow-x-auto" data-placeholder="Your keystrokes will appear here..."></div>
+            <input id="txt" type="text" class="input-field control-height" placeholder="Type here..." />
+          </div>
 
-    <p><small id="lang-note"></small></p>
-    <p><small id="script-note"></small></p>
-    <p><small id="runtime-note"></small></p>
+          <!-- Contenteditable -->
+          <div class="card card-pad">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="card-title font-display font-semibold text-stone-800">Contenteditable</h3>
+              <div class="flex items-center gap-3">
+                <span class="counter-text text-stone-400 font-medium" id="ce-counter">0 characters</span>
+                <button onclick="copyToClipboard('ce')" class="p-2 rounded-lg hover:bg-stone-100 transition-colors group" title="Copy to clipboard">
+                  <svg class="w-5 h-5 text-stone-400 group-hover:text-amber-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <div id="ce-keystrokes" class="keystroke-surface mb-3 p-3 bg-amber-50 rounded-lg border border-amber-200 font-mono text-sm text-amber-900 overflow-x-auto" data-placeholder="Your keystrokes will appear here..."></div>
+            <div id="ce" contenteditable="true" role="textbox" aria-multiline="true" class="input-field editor-surface" data-placeholder="Type here to see transliteration..."></div>
+          </div>
+
+          <!-- Clear All Button -->
+          <div class="flex justify-center">
+            <button onclick="clearAllInputs()" class="clear-btn bg-gradient-to-r from-amber-500 to-orange-500 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200 flex items-center gap-2">
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+              Clear All Inputs
+            </button>
+          </div>
+        </main>
+      </div>
+
+      <!-- Footer -->
+      <footer class="mt-16 text-center fade-in" style="animation-delay: 0.3s;">
+        <p class="text-stone-400 text-sm">
+          Built with <span class="text-amber-500">♥</span> for Indian language transliteration
+        </p>
+      </footer>
+    </div>
 
     <script type="module" src="./main.js"></script>
   </body>

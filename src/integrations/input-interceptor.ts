@@ -42,6 +42,10 @@ function isCommitKey(key: string): boolean {
   return key === " " || key === "Enter" || key === "Tab";
 }
 
+function isInsertInputType(inputType: string): boolean {
+  return inputType === "insertText" || inputType === "insertReplacementText";
+}
+
 export function createInputInterceptor(options: InputInterceptorOptions): InputInterceptor {
   const element = options.element;
   const engine = options.engine;
@@ -133,7 +137,7 @@ export function createInputInterceptor(options: InputInterceptorOptions): InputI
       return;
     }
 
-    if (evt.inputType !== "insertText") {
+    if (!isInsertInputType(evt.inputType)) {
       return;
     }
 

@@ -5,15 +5,19 @@ import { createTransliterationEngine } from "../../src/engine/transliteration-en
 import { createInputInterceptor } from "../../src/integrations/input-interceptor";
 import marathiExpanded from "../../maps/marathi/phonetic.expanded.json";
 
-function beforeInput(target: EventTarget, data: string): InputEvent {
+function beforeInputWithType(target: EventTarget, data: string, inputType: string): InputEvent {
   const evt = new InputEvent("beforeinput", {
     bubbles: true,
     cancelable: true,
-    inputType: "insertText",
+    inputType,
     data
   });
   target.dispatchEvent(evt);
   return evt;
+}
+
+function beforeInput(target: EventTarget, data: string): InputEvent {
+  return beforeInputWithType(target, data, "insertText");
 }
 
 function keydown(target: EventTarget, key: string, opts?: Partial<KeyboardEventInit>): KeyboardEvent {
@@ -55,6 +59,23 @@ describe("input interceptor", () => {
     const evt = beforeInput(el, "k");
     expect(evt.defaultPrevented).toBe(true);
     expect(el.value).toBe("क");
+
+    interceptor.detach();
+  });
+
+  it("routes insertReplacementText through transliteration path", () => {
+    const el = document.createElement("textarea");
+    document.body.appendChild(el);
+    el.value = "";
+    el.setSelectionRange(0, 0);
+
+    const engine = createTransliterationEngine({ expandedMap: marathiExpanded });
+    const interceptor = createInputInterceptor({ element: el, engine });
+    interceptor.attach();
+
+    const evt = beforeInputWithType(el, "namaste ", "insertReplacementText");
+    expect(evt.defaultPrevented).toBe(true);
+    expect(el.value).toBe("नमस्ते ");
 
     interceptor.detach();
   });

@@ -722,7 +722,7 @@ fn apply_nukta_rule_into(tokens: &[Token], script_rules: &ScriptRuleConfig, out:
     }
 }
 
-fn mapped_panchama(target: &str) -> Option<&'static str> {
+fn mapped_panchama_devanagari(target: &str) -> Option<&'static str> {
     if ["क", "ख", "ग", "घ"].contains(&target) {
         return Some("ङ");
     }
@@ -737,6 +737,59 @@ fn mapped_panchama(target: &str) -> Option<&'static str> {
     }
     if ["प", "फ", "ब", "भ"].contains(&target) {
         return Some("म");
+    }
+    None
+}
+
+const VARGA_STOP_OFFSETS: [u32; 20] = [
+    0x15, 0x16, 0x17, 0x18,
+    0x1A, 0x1B, 0x1C, 0x1D,
+    0x1F, 0x20, 0x21, 0x22,
+    0x24, 0x25, 0x26, 0x27,
+    0x2A, 0x2B, 0x2C, 0x2D,
+];
+
+const VARGA_GROUPS: [(std::ops::RangeInclusive<u32>, u32); 5] = [
+    (0x15..=0x18, 0x19),
+    (0x1A..=0x1D, 0x1E),
+    (0x1F..=0x22, 0x23),
+    (0x24..=0x27, 0x28),
+    (0x2A..=0x2D, 0x2E),
+];
+
+fn is_varga_consonant(glyph: &str, is_devanagari: bool) -> bool {
+    if is_devanagari {
+        return mapped_panchama_devanagari(glyph).is_some();
+    }
+    let cp = match glyph.chars().next() {
+        Some(ch) => ch as u32,
+        None => return false,
+    };
+    if !(0x0900..=0x0DFF).contains(&cp) {
+        return false;
+    }
+    let block_base = cp & 0xFF80;
+    let offset = cp - block_base;
+    VARGA_STOP_OFFSETS.contains(&offset)
+}
+
+fn mapped_panchama(target: &str, is_devanagari: bool) -> Option<String> {
+    if is_devanagari {
+        return mapped_panchama_devanagari(target).map(|s| s.to_owned());
+    }
+    let cp = match target.chars().next() {
+        Some(ch) => ch as u32,
+        None => return None,
+    };
+    if !(0x0900..=0x0DFF).contains(&cp) {
+        return None;
+    }
+    let block_base = cp & 0xFF80;
+    let offset = cp - block_base;
+    for (range, nasal_offset) in &VARGA_GROUPS {
+        if range.contains(&offset) {
+            return Some(char::from_u32(block_base + nasal_offset).unwrap().to_string());
+        }
     }
     None
 }
@@ -797,14 +850,21 @@ fn apply_nasalization_rule_into(
         }
 
         if *effective_mode == NasalizationMode::Anusvara {
-            out.push(Token::Mark(script_rules.anusvara.to_owned()));
-            i += 2;
+            if let Some(Token::Consonant(next_consonant)) = t2 {
+                if is_varga_consonant(next_consonant, script_rules.is_devanagari) {
+                    out.push(Token::Mark(script_rules.anusvara.to_owned()));
+                    i += 2;
+                    continue;
+                }
+            }
+            out.push(tokens[i].clone());
+            i += 1;
             continue;
         }
 
         if let Some(Token::Consonant(next_consonant)) = t2 {
-            if let Some(mapped) = mapped_panchama(next_consonant) {
-                out.push(Token::Consonant(mapped.to_owned()));
+            if let Some(mapped) = mapped_panchama(next_consonant, script_rules.is_devanagari) {
+                out.push(Token::Consonant(mapped));
                 i += 1;
                 continue;
             }

@@ -24,10 +24,47 @@ const VARGA_TO_NASAL: Array<{ chars: Set<string>; nasal: string }> = [
   { chars: new Set(["प", "फ", "ब", "भ"]), nasal: "म" }
 ];
 
-function mappedPanchama(target: string): string | null {
+const VARGA_GROUPS: Array<{ offsets: Set<number>; nasalOffset: number }> = [
+  { offsets: new Set([0x15, 0x16, 0x17, 0x18]), nasalOffset: 0x19 },
+  { offsets: new Set([0x1A, 0x1B, 0x1C, 0x1D]), nasalOffset: 0x1E },
+  { offsets: new Set([0x1F, 0x20, 0x21, 0x22]), nasalOffset: 0x23 },
+  { offsets: new Set([0x24, 0x25, 0x26, 0x27]), nasalOffset: 0x28 },
+  { offsets: new Set([0x2A, 0x2B, 0x2C, 0x2D]), nasalOffset: 0x2E }
+];
+
+function isVargaConsonant(glyph: string, scriptKind: string): boolean {
+  if (scriptKind === "devanagari") {
+    return mappedPanchamaDevanagari(glyph) !== null;
+  }
+  if (glyph.length === 0) return false;
+  const cp = glyph.codePointAt(0)!;
+  if (cp < 0x0900 || cp > 0x0DFF) return false;
+  const blockBase = cp & 0xFF80;
+  const offset = cp - blockBase;
+  return VARGA_GROUPS.some(g => g.offsets.has(offset));
+}
+
+function mappedPanchamaDevanagari(target: string): string | null {
   for (const group of VARGA_TO_NASAL) {
     if (group.chars.has(target)) {
       return group.nasal;
+    }
+  }
+  return null;
+}
+
+function mappedPanchama(target: string, scriptKind: string): string | null {
+  if (scriptKind === "devanagari") {
+    return mappedPanchamaDevanagari(target);
+  }
+  if (target.length === 0) return null;
+  const cp = target.codePointAt(0)!;
+  if (cp < 0x0900 || cp > 0x0DFF) return null;
+  const blockBase = cp & 0xFF80;
+  const offset = cp - blockBase;
+  for (const group of VARGA_GROUPS) {
+    if (group.offsets.has(offset)) {
+      return String.fromCodePoint(blockBase + group.nasalOffset);
     }
   }
   return null;
@@ -58,12 +95,16 @@ export const applyNasalizationRule: RuleFn = (tokens: Token[], ctx: RuleContext)
     }
 
     if (effectiveMode === "anusvara") {
-      out.push({ kind: "mark", glyph: ctx.script.anusvara });
-      i += 1;
+      if (isVargaConsonant(t2.glyph, ctx.script.kind)) {
+        out.push({ kind: "mark", glyph: ctx.script.anusvara });
+        i += 1;
+        continue;
+      }
+      out.push(t0);
       continue;
     }
 
-    const mapped = mappedPanchama(t2.glyph);
+    const mapped = mappedPanchama(t2.glyph, ctx.script.kind);
     if (!mapped) {
       out.push(t0);
       continue;
