@@ -46,9 +46,12 @@ function isInsertInputType(inputType: string): boolean {
   return (
     inputType === "insertText" ||
     inputType === "insertReplacementText" ||
-    inputType === "insertFromComposition" ||
-    inputType === "insertCompositionText"
+    inputType === "insertFromComposition"
   );
+}
+
+function isCompositionCommitInputType(inputType: string): boolean {
+  return inputType === "insertFromComposition" || inputType === "insertReplacementText";
 }
 
 export function createInputInterceptor(options: InputInterceptorOptions): InputInterceptor {
@@ -137,7 +140,7 @@ export function createInputInterceptor(options: InputInterceptorOptions): InputI
       return;
     }
 
-    if (isComposing && !isInsertInputType(evt.inputType)) {
+    if (isComposing && !isCompositionCommitInputType(evt.inputType)) {
       onBypass?.("composition");
       return;
     }
@@ -155,6 +158,12 @@ export function createInputInterceptor(options: InputInterceptorOptions): InputI
     const edit = text.length > 1 ? engine.processText(text) : engine.processChar(text);
     if (!applyEdit(edit)) {
       return;
+    }
+
+    // Mobile keyboards often finalize words through replacement/composition commit events.
+    // Commit engine state so the next token starts fresh instead of rewriting prior text.
+    if (isCompositionCommitInputType(evt.inputType)) {
+      engine.commit();
     }
 
     evt.preventDefault();

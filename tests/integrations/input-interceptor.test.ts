@@ -163,7 +163,7 @@ describe("input interceptor", () => {
     interceptor.detach();
   });
 
-  it("processes insertCompositionText while composing (mobile live composition path)", () => {
+  it("bypasses insertCompositionText while composing (mobile live composition update)", () => {
     const el = document.createElement("textarea");
     document.body.appendChild(el);
     el.value = "";
@@ -177,9 +177,65 @@ describe("input interceptor", () => {
     el.dispatchEvent(new CompositionEvent("compositionstart", { bubbles: true }));
     const evt = beforeInputWithType(el, "na", "insertCompositionText");
 
-    expect(evt.defaultPrevented).toBe(true);
-    expect(el.value).toBe("न");
-    expect(onBypass).not.toHaveBeenCalledWith("composition");
+    expect(evt.defaultPrevented).toBe(false);
+    expect(el.value).toBe("");
+    expect(onBypass).toHaveBeenCalledWith("composition");
+
+    interceptor.detach();
+  });
+
+  it("does not duplicate output across repeated composition updates before final commit", () => {
+    const el = document.createElement("textarea");
+    document.body.appendChild(el);
+    el.value = "";
+    el.setSelectionRange(0, 0);
+
+    const engine = createTransliterationEngine({ expandedMap: marathiExpanded });
+    const interceptor = createInputInterceptor({ element: el, engine });
+    interceptor.attach();
+
+    el.dispatchEvent(new CompositionEvent("compositionstart", { bubbles: true }));
+
+    const u1 = beforeInputWithType(el, "k", "insertCompositionText");
+    const u2 = beforeInputWithType(el, "ka", "insertCompositionText");
+    const u3 = beforeInputWithType(el, "kay", "insertCompositionText");
+    expect(u1.defaultPrevented).toBe(false);
+    expect(u2.defaultPrevented).toBe(false);
+    expect(u3.defaultPrevented).toBe(false);
+    expect(el.value).toBe("");
+
+    const commit = beforeInputWithType(el, "kay ", "insertFromComposition");
+    expect(commit.defaultPrevented).toBe(true);
+    const expected = createTransliterationEngine({ expandedMap: marathiExpanded }).processText("kay ").insert;
+    expect(el.value).toBe(expected);
+
+    el.dispatchEvent(new CompositionEvent("compositionend", { bubbles: true }));
+    interceptor.detach();
+  });
+
+  it("avoids duplicated segments across subsequent composition commits", () => {
+    const el = document.createElement("textarea");
+    document.body.appendChild(el);
+    el.value = "";
+    el.setSelectionRange(0, 0);
+
+    const engine = createTransliterationEngine({ expandedMap: marathiExpanded });
+    const interceptor = createInputInterceptor({ element: el, engine });
+    interceptor.attach();
+
+    el.dispatchEvent(new CompositionEvent("compositionstart", { bubbles: true }));
+    beforeInputWithType(el, "kay ", "insertFromComposition");
+    el.dispatchEvent(new CompositionEvent("compositionend", { bubbles: true }));
+
+    const firstChunk = el.value;
+
+    el.dispatchEvent(new CompositionEvent("compositionstart", { bubbles: true }));
+    beforeInputWithType(el, "kartay", "insertFromComposition");
+    el.dispatchEvent(new CompositionEvent("compositionend", { bubbles: true }));
+
+    const finalValue = el.value;
+    expect(finalValue).toBeTruthy();
+    expect(finalValue.includes(`${firstChunk}${firstChunk}`)).toBe(false);
 
     interceptor.detach();
   });
