@@ -11,6 +11,20 @@ import malayalamExpanded from "../../maps/malayalam/phonetic.expanded.json";
 import odiaExpanded from "../../maps/odia/phonetic.expanded.json";
 import nepaliExpanded from "../../maps/nepali/phonetic.expanded.json";
 import sanskritExpanded from "../../maps/sanskrit/phonetic.expanded.json";
+import konkaniExpanded from "../../maps/konkani/phonetic.expanded.json";
+import maithiliExpanded from "../../maps/maithili/phonetic.expanded.json";
+import dogriExpanded from "../../maps/dogri/phonetic.expanded.json";
+import bodoExpanded from "../../maps/bodo/phonetic.expanded.json";
+import sindhiExpanded from "../../maps/sindhi/phonetic.expanded.json";
+import chhattisgarhiExpanded from "../../maps/chhattisgarhi/phonetic.expanded.json";
+import bhojpuriExpanded from "../../maps/bhojpuri/phonetic.expanded.json";
+import rajasthaniExpanded from "../../maps/rajasthani/phonetic.expanded.json";
+import awadhiExpanded from "../../maps/awadhi/phonetic.expanded.json";
+import manipuriExpanded from "../../maps/manipuri/phonetic.expanded.json";
+import santaliExpanded from "../../maps/santali/phonetic.expanded.json";
+import urduExpanded from "../../maps/urdu/phonetic.expanded.json";
+import kashmiriExpanded from "../../maps/kashmiri/phonetic.expanded.json";
+import sinhalaExpanded from "../../maps/sinhala/phonetic.expanded.json";
 import type { TransliterationEngineOptions } from "../engine/transliteration-engine";
 
 export type LanguageCode =
@@ -26,7 +40,21 @@ export type LanguageCode =
   | "te"
   | "kn"
   | "ml"
-  | "or";
+  | "or"
+  | "kok"
+  | "mai"
+  | "doi"
+  | "brx"
+  | "sd"
+  | "hne"
+  | "bho"
+  | "raj"
+  | "awa"
+  | "mni"
+  | "sat"
+  | "ur"
+  | "ks"
+  | "si";
 
 type LanguageStatus = "available" | "planned";
 
@@ -167,6 +195,132 @@ const LANGUAGE_REGISTRY: Record<LanguageCode, LanguageDefinition> = {
     scriptId: "odia",
     languageId: "odia",
     expandedMap: odiaExpanded
+  },
+  kok: {
+    code: "kok",
+    name: "Konkani",
+    script: "Devanagari",
+    status: "available",
+    scriptId: "devanagari",
+    languageId: "konkani",
+    expandedMap: konkaniExpanded
+  },
+  mai: {
+    code: "mai",
+    name: "Maithili",
+    script: "Devanagari",
+    status: "available",
+    scriptId: "devanagari",
+    languageId: "maithili",
+    expandedMap: maithiliExpanded
+  },
+  doi: {
+    code: "doi",
+    name: "Dogri",
+    script: "Devanagari",
+    status: "available",
+    scriptId: "devanagari",
+    languageId: "dogri",
+    expandedMap: dogriExpanded
+  },
+  brx: {
+    code: "brx",
+    name: "Bodo",
+    script: "Devanagari",
+    status: "available",
+    scriptId: "devanagari",
+    languageId: "bodo",
+    expandedMap: bodoExpanded
+  },
+  sd: {
+    code: "sd",
+    name: "Sindhi",
+    script: "Devanagari",
+    status: "available",
+    scriptId: "devanagari",
+    languageId: "sindhi",
+    expandedMap: sindhiExpanded
+  },
+  hne: {
+    code: "hne",
+    name: "Chhattisgarhi",
+    script: "Devanagari",
+    status: "available",
+    scriptId: "devanagari",
+    languageId: "chhattisgarhi",
+    expandedMap: chhattisgarhiExpanded
+  },
+  bho: {
+    code: "bho",
+    name: "Bhojpuri",
+    script: "Devanagari",
+    status: "available",
+    scriptId: "devanagari",
+    languageId: "bhojpuri",
+    expandedMap: bhojpuriExpanded
+  },
+  raj: {
+    code: "raj",
+    name: "Rajasthani",
+    script: "Devanagari",
+    status: "available",
+    scriptId: "devanagari",
+    languageId: "rajasthani",
+    expandedMap: rajasthaniExpanded
+  },
+  awa: {
+    code: "awa",
+    name: "Awadhi",
+    script: "Devanagari",
+    status: "available",
+    scriptId: "devanagari",
+    languageId: "awadhi",
+    expandedMap: awadhiExpanded
+  },
+  mni: {
+    code: "mni",
+    name: "Manipuri",
+    script: "Meitei Mayek",
+    status: "available",
+    scriptId: "meitei",
+    languageId: "manipuri",
+    expandedMap: manipuriExpanded
+  },
+  sat: {
+    code: "sat",
+    name: "Santali",
+    script: "Ol Chiki",
+    status: "available",
+    scriptId: "olchiki",
+    languageId: "santali",
+    expandedMap: santaliExpanded
+  },
+  ur: {
+    code: "ur",
+    name: "Urdu",
+    script: "Perso-Arabic",
+    status: "available",
+    scriptId: "persoarabic",
+    languageId: "urdu",
+    expandedMap: urduExpanded
+  },
+  ks: {
+    code: "ks",
+    name: "Kashmiri",
+    script: "Perso-Arabic",
+    status: "available",
+    scriptId: "persoarabic",
+    languageId: "kashmiri",
+    expandedMap: kashmiriExpanded
+  },
+  si: {
+    code: "si",
+    name: "Sinhala",
+    script: "Sinhala",
+    status: "available",
+    scriptId: "sinhala",
+    languageId: "sinhala",
+    expandedMap: sinhalaExpanded
   }
 };
 

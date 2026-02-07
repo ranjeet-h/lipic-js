@@ -2,7 +2,13 @@ import { buildTrie, walkLongest, type TrieNode } from "./trie";
 import { createInputStack } from "./input-stack";
 import { runRulePipeline } from "./rules";
 import { getScriptRuleConfig, inferScriptRuleConfig } from "./rules/script-config";
-import type { EngineRuleOptions, NasalizationMode, RuleContext, Token } from "./rules/types";
+import type {
+  EngineRuleOptions,
+  NasalizationMode,
+  NasalizationProfile,
+  RuleContext,
+  Token
+} from "./rules/types";
 
 export type Edit = { backspace: number; insert: string };
 
@@ -55,6 +61,72 @@ const DEFAULT_RULES: EngineRuleOptions = {
   enableLigatureCollapse: true,
   enableSchwaDeletion: true
 };
+
+const VARGA_KEY_GROUPS = [
+  { stops: ["k", "kh", "g", "gh"], nasal: "ng" },
+  { stops: ["c", "ch", "j", "jh"], nasal: "ny" },
+  { stops: ["T", "Th", "D", "Dh"], nasal: "N" },
+  { stops: ["t", "th", "d", "dh"], nasal: "n" },
+  { stops: ["p", "ph", "b", "bh"], nasal: "m" }
+] as const;
+
+function maybeConsonantGlyph(
+  expandedMap: Record<string, TransliterationEntry>,
+  key: string
+): string | null {
+  const entry = expandedMap[key];
+  if (!entry || entry.type !== "consonant" || !entry.glyph) {
+    return null;
+  }
+  return entry.glyph;
+}
+
+function deriveNasalizationProfile(
+  expandedMap: Record<string, TransliterationEntry>
+): NasalizationProfile {
+  const nasalConsonants = new Set<string>();
+  const vargaConsonants = new Set<string>();
+  const panchamaByConsonant = new Map<string, string>();
+
+  for (const group of VARGA_KEY_GROUPS) {
+    const nasal = maybeConsonantGlyph(expandedMap, group.nasal);
+    if (!nasal) {
+      continue;
+    }
+    nasalConsonants.add(nasal);
+
+    for (const key of group.stops) {
+      const stop = maybeConsonantGlyph(expandedMap, key);
+      if (!stop) {
+        continue;
+      }
+      vargaConsonants.add(stop);
+      panchamaByConsonant.set(stop, nasal);
+    }
+  }
+
+  return { nasalConsonants, vargaConsonants, panchamaByConsonant };
+}
+
+function languageDefaultRuleOverrides(
+  languageId: string | undefined,
+  scriptId: string
+): Partial<EngineRuleOptions> {
+  if (languageId === "sanskrit") {
+    return {
+      enableSchwaDeletion: false,
+      nasalizationMode: "panchamakshar"
+    };
+  }
+
+  if (languageId === "tamil" || scriptId === "tamil") {
+    return {
+      nasalizationMode: "panchamakshar"
+    };
+  }
+
+  return {};
+}
 
 function isSeparator(char: string): boolean {
   return /[\s.,!?;:()[\]{}"'-]/u.test(char);
@@ -188,6 +260,10 @@ const SCRIPT_UNICODE_RANGES: Record<string, [number, number]> = {
   telugu: [0x0C00, 0x0C7F],
   kannada: [0x0C80, 0x0CFF],
   malayalam: [0x0D00, 0x0D7F],
+  meitei: [0xABC0, 0xABFF],
+  olchiki: [0x1C50, 0x1C7F],
+  persoarabic: [0x0600, 0x06FF],
+  sinhala: [0x0D80, 0x0DFF],
 };
 
 function enforceScriptSafety(rendered: string, raw: string, ruleContext: RuleContext): string {
@@ -228,19 +304,31 @@ function computeRendered(
   ruleContext: RuleContext
 ): string {
   const baseTokens = tokenizeBuffer(raw, trie, ruleContext.script.halant);
-  const ctx: RuleContext = { options: ruleOptions, script: ruleContext.script, languageId: ruleContext.languageId };
+  const ctx: RuleContext = {
+    options: ruleOptions,
+    script: ruleContext.script,
+    languageId: ruleContext.languageId,
+    nasalizationProfile: ruleContext.nasalizationProfile
+  };
   const postProcessedTokens = runRulePipeline(baseTokens, ctx);
   return enforceScriptSafety(stringifyTokens(postProcessedTokens), raw, ruleContext);
 }
 
 export function createTransliterationEngine(options: TransliterationEngineOptions): TransliterationEngine {
   const trie = options.trie ?? buildTrie(options.expandedMap);
+  const scriptConfig = (options.scriptId ? getScriptRuleConfig(options.scriptId) : null) ?? inferScriptRuleConfig(options.expandedMap);
+  const inferredDefaults = languageDefaultRuleOverrides(options.languageId, scriptConfig.scriptId);
   const ruleOptions: EngineRuleOptions = {
     ...DEFAULT_RULES,
+    ...inferredDefaults,
     ...(options.rules ?? {})
   };
-  const scriptConfig = (options.scriptId ? getScriptRuleConfig(options.scriptId) : null) ?? inferScriptRuleConfig(options.expandedMap);
-  const ruleContext: RuleContext = { options: ruleOptions, script: scriptConfig, languageId: options.languageId };
+  const ruleContext: RuleContext = {
+    options: ruleOptions,
+    script: scriptConfig,
+    languageId: options.languageId,
+    nasalizationProfile: deriveNasalizationProfile(options.expandedMap)
+  };
   const inputStack = createInputStack();
 
   let renderedBuffer = "";

@@ -1,7 +1,7 @@
 mod language_pack;
 mod trie;
 
-use hashbrown::HashMap;
+use hashbrown::{HashMap, HashSet};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap as StdHashMap;
 use trie::TrieNode;
@@ -40,6 +40,13 @@ struct RuleOptions {
     enable_schwa_deletion: bool,
 }
 
+#[derive(Clone, Debug, Default)]
+struct NasalizationProfile {
+    nasal_consonants: HashSet<String>,
+    varga_consonants: HashSet<String>,
+    panchama_by_consonant: HashMap<String, String>,
+}
+
 impl Default for RuleOptions {
     fn default() -> Self {
         Self {
@@ -54,11 +61,23 @@ impl Default for RuleOptions {
 impl RuleOptions {
     fn from_js_value(rules: Option<JsValue>) -> Result<Self, JsValue> {
         let input = parse_rule_options_input(rules)?;
-        Ok(Self::from_input(input))
+        Ok(Self::from_input(input, None, None))
     }
 
-    fn from_input(input: Option<RuleOptionsInput>) -> Self {
-        let default = Self::default();
+    fn from_input(
+        input: Option<RuleOptionsInput>,
+        language_id: Option<&str>,
+        script_id: Option<&str>,
+    ) -> Self {
+        let mut default = Self::default();
+        if language_id == Some("sanskrit") {
+            default.enable_schwa_deletion = false;
+            default.nasalization_mode = NasalizationMode::Panchamakshar;
+        }
+        if language_id == Some("tamil") || script_id == Some("tamil") {
+            default.nasalization_mode = NasalizationMode::Panchamakshar;
+        }
+
         let Some(input) = input else {
             return default;
         };
@@ -150,6 +169,34 @@ impl ScriptRuleConfig {
                 anusvara: "ം",
                 nukta: "",
             },
+            "meitei" => Self {
+                script_id: "meitei",
+                is_devanagari: false,
+                halant: "꯭",
+                anusvara: "ꯪ",
+                nukta: "",
+            },
+            "olchiki" => Self {
+                script_id: "olchiki",
+                is_devanagari: false,
+                halant: "",
+                anusvara: "ᱝ",
+                nukta: "",
+            },
+            "persoarabic" => Self {
+                script_id: "persoarabic",
+                is_devanagari: false,
+                halant: "\u{0652}",
+                anusvara: "\u{06BA}",
+                nukta: "",
+            },
+            "sinhala" => Self {
+                script_id: "sinhala",
+                is_devanagari: false,
+                halant: "්",
+                anusvara: "ං",
+                nukta: "",
+            },
             _ => Self {
                 script_id: "unknown",
                 is_devanagari: false,
@@ -190,6 +237,18 @@ fn detect_script_id_from_char(ch: char) -> Option<&'static str> {
     if (0x0D00..=0x0D7F).contains(&cp) {
         return Some("malayalam");
     }
+    if (0xABC0..=0xABFF).contains(&cp) {
+        return Some("meitei");
+    }
+    if (0x1C50..=0x1C7F).contains(&cp) {
+        return Some("olchiki");
+    }
+    if (0x0600..=0x06FF).contains(&cp) {
+        return Some("persoarabic");
+    }
+    if (0x0D80..=0x0DFF).contains(&cp) {
+        return Some("sinhala");
+    }
     None
 }
 
@@ -218,6 +277,48 @@ fn infer_script_rules_from_map(map: &HashMap<String, TransliterationEntry>) -> S
     }
 
     ScriptRuleConfig::from_script_id("unknown")
+}
+
+const VARGA_KEY_GROUPS: [([&str; 4], &str); 5] = [
+    (["k", "kh", "g", "gh"], "ng"),
+    (["c", "ch", "j", "jh"], "ny"),
+    (["T", "Th", "D", "Dh"], "N"),
+    (["t", "th", "d", "dh"], "n"),
+    (["p", "ph", "b", "bh"], "m"),
+];
+
+fn consonant_glyph_for_key<'a>(
+    map: &'a HashMap<String, TransliterationEntry>,
+    key: &str,
+) -> Option<&'a str> {
+    let entry = map.get(key)?;
+    if entry.entry_type != "consonant" || entry.glyph.is_empty() {
+        return None;
+    }
+    Some(entry.glyph.as_str())
+}
+
+fn derive_nasalization_profile(map: &HashMap<String, TransliterationEntry>) -> NasalizationProfile {
+    let mut profile = NasalizationProfile::default();
+
+    for (stops, nasal_key) in VARGA_KEY_GROUPS {
+        let Some(nasal) = consonant_glyph_for_key(map, nasal_key) else {
+            continue;
+        };
+        profile.nasal_consonants.insert(nasal.to_owned());
+
+        for stop_key in stops {
+            let Some(stop) = consonant_glyph_for_key(map, stop_key) else {
+                continue;
+            };
+            profile.varga_consonants.insert(stop.to_owned());
+            profile
+                .panchama_by_consonant
+                .insert(stop.to_owned(), nasal.to_owned());
+        }
+    }
+
+    profile
 }
 
 #[derive(Serialize)]
@@ -264,6 +365,7 @@ pub struct Engine {
     rule_options: RuleOptions,
     script_rules: ScriptRuleConfig,
     language_id: Option<String>,
+    nasalization_profile: NasalizationProfile,
 }
 
 #[wasm_bindgen]
@@ -279,6 +381,7 @@ impl Engine {
             serde_wasm_bindgen::from_value(expanded_map).map_err(to_js_error)?;
         let map: HashMap<String, TransliterationEntry> = map.into_iter().collect();
         let script_rules = infer_script_rules_from_map(&map);
+        let nasalization_profile = derive_nasalization_profile(&map);
 
         Ok(Self {
             input_buffer: String::new(),
@@ -288,6 +391,7 @@ impl Engine {
             rule_options: RuleOptions::from_js_value(rules)?,
             script_rules,
             language_id: None,
+            nasalization_profile,
         })
     }
 
@@ -326,6 +430,7 @@ impl Engine {
                     &self.trie,
                     &self.rule_options,
                     &self.script_rules,
+                    &self.nasalization_profile,
                     self.language_id.as_deref(),
                 ));
             }
@@ -381,14 +486,20 @@ impl Engine {
             decoded.body.expanded_map.into_iter().collect();
         let script_rules = ScriptRuleConfig::from_script_id(&decoded.header.script_id);
         let language_id = Some(decoded.header.language_id);
+        let nasalization_profile = derive_nasalization_profile(&pack_map);
         Ok(Self {
             input_buffer: String::new(),
             rendered_buffer: String::new(),
             rendered_len: 0,
             trie: trie::build_trie(&pack_map),
-            rule_options: RuleOptions::from_input(decoded.body.rules),
+            rule_options: RuleOptions::from_input(
+                decoded.body.rules,
+                language_id.as_deref(),
+                Some(script_rules.script_id),
+            ),
             script_rules,
             language_id,
+            nasalization_profile,
         })
     }
 
@@ -403,14 +514,20 @@ impl Engine {
             merged.body.expanded_map.into_iter().collect();
         let script_rules = ScriptRuleConfig::from_script_id(&merged.header.script_id);
         let language_id = Some(merged.header.language_id);
+        let nasalization_profile = derive_nasalization_profile(&pack_map);
         Ok(Self {
             input_buffer: String::new(),
             rendered_buffer: String::new(),
             rendered_len: 0,
             trie: trie::build_trie(&pack_map),
-            rule_options: RuleOptions::from_input(merged.body.rules),
+            rule_options: RuleOptions::from_input(
+                merged.body.rules,
+                language_id.as_deref(),
+                Some(script_rules.script_id),
+            ),
             script_rules,
             language_id,
+            nasalization_profile,
         })
     }
 }
@@ -447,6 +564,7 @@ impl Engine {
             &self.trie,
             &self.rule_options,
             &self.script_rules,
+            &self.nasalization_profile,
             self.language_id.as_deref(),
         );
         let edit = Edit {
@@ -722,113 +840,73 @@ fn apply_nukta_rule_into(tokens: &[Token], script_rules: &ScriptRuleConfig, out:
     }
 }
 
-fn mapped_panchama_devanagari(target: &str) -> Option<&'static str> {
+fn is_varga_consonant(glyph: &str, profile: &NasalizationProfile) -> bool {
+    if profile.varga_consonants.contains(glyph) {
+        return true;
+    }
+    [
+        "क", "ख", "ग", "घ", "च", "छ", "ज", "झ", "ट", "ठ", "ड", "ढ", "त", "थ", "द", "ध", "प",
+        "फ", "ब", "भ",
+    ]
+    .contains(&glyph)
+}
+
+fn mapped_panchama(target: &str, profile: &NasalizationProfile) -> Option<String> {
+    if let Some(mapped) = profile.panchama_by_consonant.get(target) {
+        return Some(mapped.clone());
+    }
     if ["क", "ख", "ग", "घ"].contains(&target) {
-        return Some("ङ");
+        return Some("ङ".to_owned());
     }
     if ["च", "छ", "ज", "झ"].contains(&target) {
-        return Some("ञ");
+        return Some("ञ".to_owned());
     }
     if ["ट", "ठ", "ड", "ढ"].contains(&target) {
-        return Some("ण");
+        return Some("ण".to_owned());
     }
     if ["त", "थ", "द", "ध"].contains(&target) {
-        return Some("न");
+        return Some("न".to_owned());
     }
     if ["प", "फ", "ब", "भ"].contains(&target) {
-        return Some("म");
+        return Some("म".to_owned());
     }
     None
 }
 
-const VARGA_STOP_OFFSETS: [u32; 20] = [
-    0x15, 0x16, 0x17, 0x18,
-    0x1A, 0x1B, 0x1C, 0x1D,
-    0x1F, 0x20, 0x21, 0x22,
-    0x24, 0x25, 0x26, 0x27,
-    0x2A, 0x2B, 0x2C, 0x2D,
-];
-
-const VARGA_GROUPS: [(std::ops::RangeInclusive<u32>, u32); 5] = [
-    (0x15..=0x18, 0x19),
-    (0x1A..=0x1D, 0x1E),
-    (0x1F..=0x22, 0x23),
-    (0x24..=0x27, 0x28),
-    (0x2A..=0x2D, 0x2E),
-];
-
-fn is_varga_consonant(glyph: &str, is_devanagari: bool) -> bool {
-    if is_devanagari {
-        return mapped_panchama_devanagari(glyph).is_some();
-    }
-    let cp = match glyph.chars().next() {
-        Some(ch) => ch as u32,
-        None => return false,
-    };
-    if !(0x0900..=0x0DFF).contains(&cp) {
-        return false;
-    }
-    let block_base = cp & 0xFF80;
-    let offset = cp - block_base;
-    VARGA_STOP_OFFSETS.contains(&offset)
+fn is_nasal_consonant(glyph: &str, profile: &NasalizationProfile) -> bool {
+    profile.nasal_consonants.contains(glyph)
+        || ["ङ", "ञ", "ण", "न", "म"].contains(&glyph)
 }
 
-fn mapped_panchama(target: &str, is_devanagari: bool) -> Option<String> {
-    if is_devanagari {
-        return mapped_panchama_devanagari(target).map(|s| s.to_owned());
-    }
-    let cp = match target.chars().next() {
-        Some(ch) => ch as u32,
-        None => return None,
-    };
-    if !(0x0900..=0x0DFF).contains(&cp) {
-        return None;
-    }
-    let block_base = cp & 0xFF80;
-    let offset = cp - block_base;
-    for (range, nasal_offset) in &VARGA_GROUPS {
-        if range.contains(&offset) {
-            return Some(char::from_u32(block_base + nasal_offset).unwrap().to_string());
-        }
-    }
-    None
-}
-
-fn is_nasal_consonant(glyph: &str, is_devanagari: bool) -> bool {
-    const DEVANAGARI_NASALS: [&str; 5] = ["ङ", "ञ", "ण", "न", "म"];
-    const NASAL_OFFSETS: [u32; 5] = [0x19, 0x1E, 0x23, 0x28, 0x2E];
-
-    if is_devanagari {
-        return DEVANAGARI_NASALS.contains(&glyph);
-    }
-
-    let cp = match glyph.chars().next() {
-        Some(ch) => ch as u32,
-        None => return false,
-    };
-
-    if !(0x0900..=0x0DFF).contains(&cp) {
+fn is_short_gurmukhi_vowel_before(tokens: &[Token], index: usize) -> bool {
+    if index == 0 {
         return false;
     }
+    let prev = tokens.get(index - 1);
+    matches!(prev, Some(Token::InherentA))
+        || matches!(prev, Some(Token::Matra(g)) if g == "ਿ" || g == "ੁ" || g == "੃")
+        || matches!(prev, Some(Token::VowelIndependent(g)) if g == "ਅ" || g == "ਇ" || g == "ਉ")
+}
 
-    let block_base = cp & 0xFF80;
-    let offset = cp - block_base;
-    NASAL_OFFSETS.contains(&offset)
+fn anusvara_for_context(tokens: &[Token], index: usize, script_rules: &ScriptRuleConfig) -> String {
+    if script_rules.script_id != "gurmukhi" {
+        return script_rules.anusvara.to_owned();
+    }
+    if is_short_gurmukhi_vowel_before(tokens, index) {
+        "ੰ".to_owned()
+    } else {
+        "ਂ".to_owned()
+    }
 }
 
 fn apply_nasalization_rule_into(
     tokens: &[Token],
     options: &RuleOptions,
     script_rules: &ScriptRuleConfig,
+    profile: &NasalizationProfile,
     out: &mut Vec<Token>,
 ) {
-    let effective_mode = if options.nasalization_mode == NasalizationMode::Panchamakshar
-        && !script_rules.is_devanagari
-    {
-        &NasalizationMode::Anusvara
-    } else {
-        &options.nasalization_mode
-    };
+    let effective_mode = &options.nasalization_mode;
 
     out.clear();
     out.reserve(tokens.len());
@@ -839,7 +917,7 @@ fn apply_nasalization_rule_into(
         let t1 = tokens.get(i + 1);
         let t2 = tokens.get(i + 2);
 
-        let is_nasal_cluster = matches!(t0, Some(Token::Consonant(g)) if is_nasal_consonant(g, script_rules.is_devanagari))
+        let is_nasal_cluster = matches!(t0, Some(Token::Consonant(g)) if is_nasal_consonant(g, profile))
             && matches!(t1, Some(Token::Halant(_)))
             && matches!(t2, Some(Token::Consonant(_)));
 
@@ -851,8 +929,8 @@ fn apply_nasalization_rule_into(
 
         if *effective_mode == NasalizationMode::Anusvara {
             if let Some(Token::Consonant(next_consonant)) = t2 {
-                if is_varga_consonant(next_consonant, script_rules.is_devanagari) {
-                    out.push(Token::Mark(script_rules.anusvara.to_owned()));
+                if is_varga_consonant(next_consonant, profile) {
+                    out.push(Token::Mark(anusvara_for_context(tokens, i, script_rules)));
                     i += 2;
                     continue;
                 }
@@ -863,7 +941,7 @@ fn apply_nasalization_rule_into(
         }
 
         if let Some(Token::Consonant(next_consonant)) = t2 {
-            if let Some(mapped) = mapped_panchama(next_consonant, script_rules.is_devanagari) {
+            if let Some(mapped) = mapped_panchama(next_consonant, profile) {
                 out.push(Token::Consonant(mapped));
                 i += 1;
                 continue;
@@ -935,11 +1013,48 @@ fn is_word_end(tokens: &[Token], index: usize) -> bool {
     next.is_none() || is_word_boundary_token(next)
 }
 
-fn apply_schwa_rule_in_place(out: &mut Vec<Token>, script_rules: &ScriptRuleConfig) {
+#[derive(Clone, Copy)]
+struct SchwaProfile {
+    convert_anusvara_word_end_to_akar: bool,
+    convert_kay_word_end: bool,
+    convert_qa_word_end_to_akar: bool,
+    marathi_verb_tay_rule: bool,
+    marathi_verb_tos_rule: bool,
+}
+
+const DEFAULT_DEVANAGARI_SCHWA_PROFILE: SchwaProfile = SchwaProfile {
+    convert_anusvara_word_end_to_akar: true,
+    convert_kay_word_end: false,
+    convert_qa_word_end_to_akar: true,
+    marathi_verb_tay_rule: false,
+    marathi_verb_tos_rule: false,
+};
+
+const MARATHI_FAMILY_SCHWA_PROFILE: SchwaProfile = SchwaProfile {
+    convert_anusvara_word_end_to_akar: true,
+    convert_kay_word_end: true,
+    convert_qa_word_end_to_akar: true,
+    marathi_verb_tay_rule: true,
+    marathi_verb_tos_rule: true,
+};
+
+fn schwa_profile_for_language(language_id: Option<&str>) -> SchwaProfile {
+    match language_id {
+        Some("marathi") | Some("konkani") => MARATHI_FAMILY_SCHWA_PROFILE,
+        _ => DEFAULT_DEVANAGARI_SCHWA_PROFILE,
+    }
+}
+
+fn apply_schwa_rule_in_place(
+    out: &mut Vec<Token>,
+    script_rules: &ScriptRuleConfig,
+    profile: SchwaProfile,
+) {
     let mut i = 0usize;
 
     while i < out.len() {
-        if matches!(out.get(i), Some(Token::Mark(g)) if g == script_rules.anusvara)
+        if profile.convert_anusvara_word_end_to_akar
+            && matches!(out.get(i), Some(Token::Mark(g)) if g == script_rules.anusvara)
             && matches!(out.get(i + 1), Some(Token::Consonant(_)))
             && matches!(out.get(i + 2), Some(Token::InherentA))
             && is_word_end(&out, i + 2)
@@ -947,7 +1062,8 @@ fn apply_schwa_rule_in_place(out: &mut Vec<Token>, script_rules: &ScriptRuleConf
             out[i + 2] = Token::Matra("ा".to_owned());
         }
 
-        if matches!(out.get(i), Some(Token::Consonant(g)) if g == "क")
+        if profile.convert_kay_word_end
+            && matches!(out.get(i), Some(Token::Consonant(g)) if g == "क")
             && matches!(out.get(i + 1), Some(Token::InherentA))
             && matches!(out.get(i + 2), Some(Token::Consonant(g)) if g == "य")
             && is_word_end(&out, i + 2)
@@ -955,14 +1071,16 @@ fn apply_schwa_rule_in_place(out: &mut Vec<Token>, script_rules: &ScriptRuleConf
             out[i + 1] = Token::Matra("ा".to_owned());
         }
 
-        if matches!(out.get(i), Some(Token::Consonant(g)) if g == "क़")
+        if profile.convert_qa_word_end_to_akar
+            && matches!(out.get(i), Some(Token::Consonant(g)) if g == "क़")
             && matches!(out.get(i + 1), Some(Token::InherentA))
             && is_word_end(&out, i + 1)
         {
             out[i + 1] = Token::Matra("ा".to_owned());
         }
 
-        if matches!(out.get(i), Some(Token::Consonant(g)) if g == "र")
+        if profile.marathi_verb_tay_rule
+            && matches!(out.get(i), Some(Token::Consonant(g)) if g == "र")
             && matches!(out.get(i + 1), Some(Token::Halant(_)))
             && matches!(out.get(i + 2), Some(Token::Consonant(g)) if g == "त")
             && matches!(out.get(i + 3), Some(Token::InherentA))
@@ -973,7 +1091,8 @@ fn apply_schwa_rule_in_place(out: &mut Vec<Token>, script_rules: &ScriptRuleConf
             out[i + 2] = Token::Matra("ा".to_owned());
         }
 
-        if matches!(out.get(i), Some(Token::Consonant(g)) if g == "र")
+        if profile.marathi_verb_tos_rule
+            && matches!(out.get(i), Some(Token::Consonant(g)) if g == "र")
             && matches!(out.get(i + 1), Some(Token::Halant(_)))
             && matches!(out.get(i + 2), Some(Token::Consonant(g)) if g == "त")
             && matches!(out.get(i + 3), Some(Token::Matra(g)) if g == "ो")
@@ -991,6 +1110,7 @@ fn run_rule_pipeline(
     tokens: Vec<Token>,
     options: &RuleOptions,
     script_rules: &ScriptRuleConfig,
+    nasalization_profile: &NasalizationProfile,
     language_id: Option<&str>,
 ) -> Vec<Token> {
     let mut primary = tokens;
@@ -1001,7 +1121,7 @@ fn run_rule_pipeline(
         std::mem::swap(&mut primary, &mut secondary);
     }
 
-    apply_nasalization_rule_into(&primary, options, script_rules, &mut secondary);
+    apply_nasalization_rule_into(&primary, options, script_rules, nasalization_profile, &mut secondary);
     std::mem::swap(&mut primary, &mut secondary);
 
     if options.enable_ligature_collapse {
@@ -1013,7 +1133,8 @@ fn run_rule_pipeline(
         && script_rules.is_devanagari
         && language_id != Some("sanskrit")
     {
-        apply_schwa_rule_in_place(&mut primary, script_rules);
+        let profile = schwa_profile_for_language(language_id);
+        apply_schwa_rule_in_place(&mut primary, script_rules, profile);
     }
 
     primary
@@ -1042,10 +1163,17 @@ fn compute_rendered(
     trie: &TrieNode<TransliterationEntry>,
     options: &RuleOptions,
     script_rules: &ScriptRuleConfig,
+    nasalization_profile: &NasalizationProfile,
     language_id: Option<&str>,
 ) -> String {
     let base_tokens = tokenize_buffer(raw, trie, script_rules);
-    let post_tokens = run_rule_pipeline(base_tokens, options, script_rules, language_id);
+    let post_tokens = run_rule_pipeline(
+        base_tokens,
+        options,
+        script_rules,
+        nasalization_profile,
+        language_id,
+    );
     let rendered = stringify_tokens(&post_tokens);
     enforce_script_safety(rendered, raw, script_rules)
 }
@@ -1061,6 +1189,10 @@ fn script_unicode_range(script_id: &str) -> Option<(u32, u32)> {
         "telugu" => Some((0x0C00, 0x0C7F)),
         "kannada" => Some((0x0C80, 0x0CFF)),
         "malayalam" => Some((0x0D00, 0x0D7F)),
+        "meitei" => Some((0xABC0, 0xABFF)),
+        "olchiki" => Some((0x1C50, 0x1C7F)),
+        "persoarabic" => Some((0x0600, 0x06FF)),
+        "sinhala" => Some((0x0D80, 0x0DFF)),
         _ => None,
     }
 }
@@ -1290,32 +1422,73 @@ mod tests {
 
     #[test]
     fn compute_rendered_matches_basic_js_behaviors() {
-        let trie = trie::build_trie(&test_map());
+        let map = test_map();
+        let trie = trie::build_trie(&map);
+        let nasalization_profile = derive_nasalization_profile(&map);
         let options = RuleOptions::default();
         let script_rules = ScriptRuleConfig::from_script_id("devanagari");
-        assert_eq!(compute_rendered("k", &trie, &options, &script_rules, None), "क");
-        assert_eq!(compute_rendered("kh", &trie, &options, &script_rules, None), "ख");
-        assert_eq!(compute_rendered("ka", &trie, &options, &script_rules, None), "क");
-        assert_eq!(compute_rendered("kA", &trie, &options, &script_rules, None), "का");
+        assert_eq!(
+            compute_rendered("k", &trie, &options, &script_rules, &nasalization_profile, None),
+            "क"
+        );
+        assert_eq!(
+            compute_rendered("kh", &trie, &options, &script_rules, &nasalization_profile, None),
+            "ख"
+        );
+        assert_eq!(
+            compute_rendered("ka", &trie, &options, &script_rules, &nasalization_profile, None),
+            "क"
+        );
+        assert_eq!(
+            compute_rendered("kA", &trie, &options, &script_rules, &nasalization_profile, None),
+            "का"
+        );
     }
 
     #[test]
     fn rule_pipeline_nukta_ligature_schwa_paths() {
-        let trie = trie::build_trie(&test_map());
+        let map = test_map();
+        let trie = trie::build_trie(&map);
+        let nasalization_profile = derive_nasalization_profile(&map);
         let options = RuleOptions::default();
         let script_rules = ScriptRuleConfig::from_script_id("devanagari");
-        assert_eq!(compute_rendered("qa", &trie, &options, &script_rules, None), "क़ा");
-        assert_eq!(compute_rendered("ksh", &trie, &options, &script_rules, None), "क्ष");
-        assert_eq!(compute_rendered("kay", &trie, &options, &script_rules, None), "काय");
         assert_eq!(
-            compute_rendered("kartos", &trie, &options, &script_rules, None),
+            compute_rendered("qa", &trie, &options, &script_rules, &nasalization_profile, None),
+            "क़ा"
+        );
+        assert_eq!(
+            compute_rendered("ksh", &trie, &options, &script_rules, &nasalization_profile, None),
+            "क्ष"
+        );
+        assert_eq!(
+            compute_rendered(
+                "kay",
+                &trie,
+                &options,
+                &script_rules,
+                &nasalization_profile,
+                Some("marathi")
+            ),
+            "काय"
+        );
+        assert_eq!(
+            compute_rendered(
+                "kartos",
+                &trie,
+                &options,
+                &script_rules,
+                &nasalization_profile,
+                Some("marathi")
+            ),
             "करतोस"
         );
     }
 
     #[test]
     fn rule_options_toggles_affect_output() {
-        let trie = trie::build_trie(&test_map());
+        let map = test_map();
+        let trie = trie::build_trie(&map);
+        let nasalization_profile = derive_nasalization_profile(&map);
         let script_rules = ScriptRuleConfig::from_script_id("devanagari");
         let options = RuleOptions {
             enable_nukta: false,
@@ -1323,17 +1496,32 @@ mod tests {
             enable_ligature_collapse: false,
             enable_schwa_deletion: false,
         };
-        assert_eq!(compute_rendered("q", &trie, &options, &script_rules, None), "q");
-        assert_eq!(compute_rendered("ksh", &trie, &options, &script_rules, None), "क्श");
         assert_eq!(
-            compute_rendered("kartay", &trie, &options, &script_rules, None),
+            compute_rendered("q", &trie, &options, &script_rules, &nasalization_profile, None),
+            "q"
+        );
+        assert_eq!(
+            compute_rendered("ksh", &trie, &options, &script_rules, &nasalization_profile, None),
+            "क्श"
+        );
+        assert_eq!(
+            compute_rendered(
+                "kartay",
+                &trie,
+                &options,
+                &script_rules,
+                &nasalization_profile,
+                None
+            ),
             "कर्तय"
         );
     }
 
     #[test]
     fn nasalization_modes_match_expected_behavior() {
-        let trie = trie::build_trie(&test_map());
+        let map = test_map();
+        let trie = trie::build_trie(&map);
+        let nasalization_profile = derive_nasalization_profile(&map);
         let script_rules = ScriptRuleConfig::from_script_id("devanagari");
         let default = RuleOptions::default();
         let panchama = RuleOptions {
@@ -1344,11 +1532,25 @@ mod tests {
         };
 
         assert_eq!(
-            compute_rendered("anka", &trie, &default, &script_rules, None),
+            compute_rendered(
+                "anka",
+                &trie,
+                &default,
+                &script_rules,
+                &nasalization_profile,
+                None
+            ),
             "अंका"
         );
         assert_eq!(
-            compute_rendered("anka", &trie, &panchama, &script_rules, None),
+            compute_rendered(
+                "anka",
+                &trie,
+                &panchama,
+                &script_rules,
+                &nasalization_profile,
+                None
+            ),
             "अङ्क"
         );
     }
@@ -1398,11 +1600,21 @@ mod tests {
         );
 
         let trie = trie::build_trie(&map);
+        let nasalization_profile = derive_nasalization_profile(&map);
         let options = RuleOptions::default();
         let script_rules = ScriptRuleConfig::from_script_id("bengali");
 
-        assert_eq!(compute_rendered("kta", &trie, &options, &script_rules, None), "ক্ত");
-        assert_eq!(compute_rendered("qa", &trie, &options, &script_rules, None), "qa");
-        assert_eq!(compute_rendered("f", &trie, &options, &script_rules, None), "ফ়");
+        assert_eq!(
+            compute_rendered("kta", &trie, &options, &script_rules, &nasalization_profile, None),
+            "ক্ত"
+        );
+        assert_eq!(
+            compute_rendered("qa", &trie, &options, &script_rules, &nasalization_profile, None),
+            "qa"
+        );
+        assert_eq!(
+            compute_rendered("f", &trie, &options, &script_rules, &nasalization_profile, None),
+            "ফ়"
+        );
     }
 }

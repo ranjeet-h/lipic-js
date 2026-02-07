@@ -10539,7 +10539,7 @@ interface InputInterceptor {
 }
 declare function createInputInterceptor(options: InputInterceptorOptions): InputInterceptor;
 
-type LanguageCode = "hi" | "mr" | "ne" | "sa" | "bn" | "as" | "gu" | "pa" | "ta" | "te" | "kn" | "ml" | "or";
+type LanguageCode = "hi" | "mr" | "ne" | "sa" | "bn" | "as" | "gu" | "pa" | "ta" | "te" | "kn" | "ml" | "or" | "kok" | "mai" | "doi" | "brx" | "sd" | "hne" | "bho" | "raj" | "awa" | "mni" | "sat" | "ur" | "ks" | "si";
 type LanguageStatus = "available" | "planned";
 interface LanguageRegistryItem {
     code: LanguageCode;

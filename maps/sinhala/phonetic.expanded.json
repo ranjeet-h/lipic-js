@@ -1,0 +1,273 @@
+{
+  "a": {
+    "type": "vowel",
+    "glyph": "අ",
+    "matra": ""
+  },
+  "A": {
+    "type": "vowel",
+    "glyph": "ආ",
+    "matra": "ා"
+  },
+  "aa": {
+    "type": "vowel",
+    "glyph": "ආ",
+    "matra": "ා"
+  },
+  "i": {
+    "type": "vowel",
+    "glyph": "ඉ",
+    "matra": "ි"
+  },
+  "I": {
+    "type": "vowel",
+    "glyph": "ඊ",
+    "matra": "ී"
+  },
+  "ii": {
+    "type": "vowel",
+    "glyph": "ඊ",
+    "matra": "ී"
+  },
+  "u": {
+    "type": "vowel",
+    "glyph": "උ",
+    "matra": "ු"
+  },
+  "U": {
+    "type": "vowel",
+    "glyph": "ඌ",
+    "matra": "ූ"
+  },
+  "uu": {
+    "type": "vowel",
+    "glyph": "ඌ",
+    "matra": "ූ"
+  },
+  "ri": {
+    "type": "vowel",
+    "glyph": "ඍ",
+    "matra": "ෘ"
+  },
+  "R": {
+    "type": "vowel",
+    "glyph": "ඍ",
+    "matra": "ෘ"
+  },
+  "e": {
+    "type": "vowel",
+    "glyph": "ඒ",
+    "matra": "ේ"
+  },
+  "ai": {
+    "type": "vowel",
+    "glyph": "ඓ",
+    "matra": "ෛ"
+  },
+  "o": {
+    "type": "vowel",
+    "glyph": "ඕ",
+    "matra": "ෝ"
+  },
+  "au": {
+    "type": "vowel",
+    "glyph": "ඖ",
+    "matra": "ෞ"
+  },
+  "k": {
+    "type": "consonant",
+    "glyph": "ක"
+  },
+  "kh": {
+    "type": "consonant",
+    "glyph": "ඛ"
+  },
+  "g": {
+    "type": "consonant",
+    "glyph": "ග"
+  },
+  "gh": {
+    "type": "consonant",
+    "glyph": "ඝ"
+  },
+  "ng": {
+    "type": "consonant",
+    "glyph": "ඞ"
+  },
+  "ch": {
+    "type": "consonant",
+    "glyph": "ච"
+  },
+  "chh": {
+    "type": "consonant",
+    "glyph": "ඡ"
+  },
+  "j": {
+    "type": "consonant",
+    "glyph": "ජ"
+  },
+  "jh": {
+    "type": "consonant",
+    "glyph": "ඣ"
+  },
+  "ny": {
+    "type": "consonant",
+    "glyph": "ඤ"
+  },
+  "T": {
+    "type": "consonant",
+    "glyph": "ට"
+  },
+  "Th": {
+    "type": "consonant",
+    "glyph": "ඨ"
+  },
+  "D": {
+    "type": "consonant",
+    "glyph": "ඩ"
+  },
+  "Dh": {
+    "type": "consonant",
+    "glyph": "ඪ"
+  },
+  "N": {
+    "type": "consonant",
+    "glyph": "ණ"
+  },
+  "t": {
+    "type": "consonant",
+    "glyph": "ත"
+  },
+  "th": {
+    "type": "consonant",
+    "glyph": "ථ"
+  },
+  "d": {
+    "type": "consonant",
+    "glyph": "ද"
+  },
+  "dh": {
+    "type": "consonant",
+    "glyph": "ධ"
+  },
+  "n": {
+    "type": "consonant",
+    "glyph": "න"
+  },
+  "p": {
+    "type": "consonant",
+    "glyph": "ප"
+  },
+  "ph": {
+    "type": "consonant",
+    "glyph": "ඵ"
+  },
+  "b": {
+    "type": "consonant",
+    "glyph": "බ"
+  },
+  "bh": {
+    "type": "consonant",
+    "glyph": "භ"
+  },
+  "m": {
+    "type": "consonant",
+    "glyph": "ම"
+  },
+  "y": {
+    "type": "consonant",
+    "glyph": "ය"
+  },
+  "r": {
+    "type": "consonant",
+    "glyph": "ර"
+  },
+  "l": {
+    "type": "consonant",
+    "glyph": "ල"
+  },
+  "v": {
+    "type": "consonant",
+    "glyph": "ව"
+  },
+  "w": {
+    "type": "consonant",
+    "glyph": "ව"
+  },
+  "sh": {
+    "type": "consonant",
+    "glyph": "ශ"
+  },
+  "S": {
+    "type": "consonant",
+    "glyph": "ශ"
+  },
+  "Sh": {
+    "type": "consonant",
+    "glyph": "ෂ"
+  },
+  "s": {
+    "type": "consonant",
+    "glyph": "ස"
+  },
+  "h": {
+    "type": "consonant",
+    "glyph": "හ"
+  },
+  "M": {
+    "type": "mark",
+    "glyph": "ං"
+  },
+  "MM": {
+    "type": "mark",
+    "glyph": "ँ"
+  },
+  "H": {
+    "type": "mark",
+    "glyph": "ඃ"
+  },
+  "ksh": {
+    "type": "conjunct",
+    "glyph": "ක්‍ෂ"
+  },
+  "x": {
+    "type": "conjunct",
+    "glyph": "ක්‍ෂ"
+  },
+  "gy": {
+    "type": "conjunct",
+    "glyph": "ඥ"
+  },
+  "dny": {
+    "type": "conjunct",
+    "glyph": "ඥ"
+  },
+  "jn": {
+    "type": "conjunct",
+    "glyph": "ඥ"
+  },
+  "tr": {
+    "type": "conjunct",
+    "glyph": "ත්ර"
+  },
+  "shr": {
+    "type": "conjunct",
+    "glyph": "ශ්ර"
+  },
+  "z": {
+    "type": "consonant",
+    "glyph": "ජ"
+  },
+  "f": {
+    "type": "consonant",
+    "glyph": "ඵ"
+  },
+  "Rr": {
+    "type": "consonant",
+    "glyph": "ඩ"
+  },
+  "Rh": {
+    "type": "consonant",
+    "glyph": "ඪ"
+  }
+}

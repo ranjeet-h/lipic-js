@@ -1,37 +1,67 @@
 import {
-  assamesePhoneticExpanded,
-  bengaliPhoneticExpanded,
   createHybridTransliterationEngine,
   createInputInterceptor,
-  gujaratiPhoneticExpanded,
   getEngineRuntime,
-  hindiPhoneticExpanded,
-  kannadaPhoneticExpanded,
-  malayalamPhoneticExpanded,
-  marathiPhoneticExpanded,
-  nepaliPhoneticExpanded,
-  odiaPhoneticExpanded,
-  punjabiPhoneticExpanded,
-  sanskritPhoneticExpanded,
-  tamilPhoneticExpanded,
-  teluguPhoneticExpanded
+  listLanguages,
+  resolveLanguageEngineConfig
 } from "../dist/index.js";
 
-const LANGUAGE_CONFIG = {
-  hi: { name: "Hindi", scriptName: "Devanagari", scriptId: "devanagari", languageId: "hindi", expandedMap: hindiPhoneticExpanded },
-  mr: { name: "Marathi", scriptName: "Devanagari", scriptId: "devanagari", languageId: "marathi", expandedMap: marathiPhoneticExpanded },
-  ne: { name: "Nepali", scriptName: "Devanagari", scriptId: "devanagari", languageId: "nepali", expandedMap: nepaliPhoneticExpanded },
-  sa: { name: "Sanskrit", scriptName: "Devanagari", scriptId: "devanagari", languageId: "sanskrit", expandedMap: sanskritPhoneticExpanded },
-  bn: { name: "Bengali", scriptName: "Bengali", scriptId: "bengali", languageId: "bengali", expandedMap: bengaliPhoneticExpanded },
-  as: { name: "Assamese", scriptName: "Bengali", scriptId: "bengali", languageId: "assamese", expandedMap: assamesePhoneticExpanded },
-  gu: { name: "Gujarati", scriptName: "Gujarati", scriptId: "gujarati", languageId: "gujarati", expandedMap: gujaratiPhoneticExpanded },
-  pa: { name: "Punjabi", scriptName: "Gurmukhi", scriptId: "gurmukhi", languageId: "punjabi", expandedMap: punjabiPhoneticExpanded },
-  ta: { name: "Tamil", scriptName: "Tamil", scriptId: "tamil", languageId: "tamil", expandedMap: tamilPhoneticExpanded },
-  te: { name: "Telugu", scriptName: "Telugu", scriptId: "telugu", languageId: "telugu", expandedMap: teluguPhoneticExpanded },
-  kn: { name: "Kannada", scriptName: "Kannada", scriptId: "kannada", languageId: "kannada", expandedMap: kannadaPhoneticExpanded },
-  ml: { name: "Malayalam", scriptName: "Malayalam", scriptId: "malayalam", languageId: "malayalam", expandedMap: malayalamPhoneticExpanded },
-  or: { name: "Odia", scriptName: "Odia", scriptId: "odia", languageId: "odia", expandedMap: odiaPhoneticExpanded }
+const NATIVE_NAMES = {
+  hi: "हिन्दी",
+  mr: "मराठी",
+  ne: "नेपाली",
+  sa: "संस्कृतम्",
+  bn: "বাংলা",
+  as: "অসমীয়া",
+  gu: "ગુજરાતી",
+  pa: "ਪੰਜਾਬੀ",
+  ta: "தமிழ்",
+  te: "తెలుగు",
+  kn: "ಕನ್ನಡ",
+  ml: "മലയാളം",
+  or: "ଓଡ଼ିଆ",
+  kok: "कोंकणी",
+  mai: "मैथिली",
+  doi: "डोगरी",
+  brx: "बोडो",
+  sd: "सिन्धी",
+  hne: "छत्तीसगढ़ी",
+  bho: "भोजपुरी",
+  raj: "राजस्थानी",
+  awa: "अवधी",
+  mni: "ꯃꯤꯇꯩꯂꯣꯟ",
+  sat: "ᱥᱟᱱᱛᱟᱲᱤ",
+  ur: "اردو",
+  ks: "کشمیری",
+  si: "සිංහල"
 };
+
+const AVAILABLE_LANGUAGES = listLanguages()
+  .filter((language) => language.status === "available");
+
+const LANGUAGE_CONFIG = Object.fromEntries(
+  AVAILABLE_LANGUAGES
+    .map((language) => {
+      const resolved = resolveLanguageEngineConfig(language.code);
+      return [
+        language.code,
+        {
+          code: language.code,
+          name: language.name,
+          scriptName: language.script,
+          ...resolved
+        }
+      ];
+    })
+);
+
+function languageLabel(language) {
+  const nativeName = NATIVE_NAMES[language.code];
+  if (nativeName) {
+    return `${language.name} (${nativeName})`;
+  }
+  return `${language.name} (${language.code})`;
+}
 
 function parseWasmMode(value) {
   if (value === "true") return true;
@@ -198,8 +228,7 @@ async function loadKeyboardReference() {
   const config = getLanguageConfig(languageCode);
 
   try {
-    const response = await fetch(`../maps/${config.languageId}/phonetic.expanded.json`);
-    const map = await response.json();
+    const map = config.expandedMap;
 
     const vowels = [];
     const consonants = [];
@@ -254,6 +283,19 @@ function getLanguageConfig(languageCode) {
   return LANGUAGE_CONFIG[languageCode] ?? LANGUAGE_CONFIG.hi;
 }
 
+function populateLanguageOptions() {
+  const current = lang.value || "hi";
+  const options = AVAILABLE_LANGUAGES.map((language) => {
+    const selected = language.code === current ? " selected" : "";
+    return `<option value="${language.code}"${selected}>${escapeHtml(languageLabel(language))}</option>`;
+  });
+
+  lang.innerHTML = options.join("");
+  if (!LANGUAGE_CONFIG[lang.value]) {
+    lang.value = "hi";
+  }
+}
+
 async function makeEngine(languageCode, wasmMode) {
   const config = getLanguageConfig(languageCode);
   return createHybridTransliterationEngine(
@@ -295,6 +337,7 @@ async function attachForLanguage(languageCode, wasmMode) {
   scriptNote.textContent = `Script: ${config.scriptName} | Engine config: ${config.scriptId}/${config.languageId}`;
 }
 
+populateLanguageOptions();
 await attachForLanguage(lang.value, parseWasmMode(wasmModeSelect.value));
 
 const onSelectionChange = async () => {

@@ -1,0 +1,201 @@
+{
+  "a": {
+    "type": "vowel",
+    "glyph": "ꯑ",
+    "matra": ""
+  },
+  "aa": {
+    "type": "vowel",
+    "glyph": "ꯑꯥ",
+    "matra": "ꯥ"
+  },
+  "i": {
+    "type": "vowel",
+    "glyph": "ꯏ",
+    "matra": "ꯤ"
+  },
+  "ii": {
+    "type": "vowel",
+    "glyph": "ꯏ",
+    "matra": "ꯤ"
+  },
+  "u": {
+    "type": "vowel",
+    "glyph": "ꯎ",
+    "matra": "ꯨ"
+  },
+  "uu": {
+    "type": "vowel",
+    "glyph": "ꯎ",
+    "matra": "ꯨ"
+  },
+  "ri": {
+    "type": "vowel",
+    "glyph": "ꯔꯨ",
+    "matra": "꯭ꯔꯨ"
+  },
+  "e": {
+    "type": "vowel",
+    "glyph": "ꯑꯦ",
+    "matra": "ꯦ"
+  },
+  "ai": {
+    "type": "vowel",
+    "glyph": "ꯑꯩ",
+    "matra": "ꯩ"
+  },
+  "o": {
+    "type": "vowel",
+    "glyph": "ꯑꯣ",
+    "matra": "ꯣ"
+  },
+  "au": {
+    "type": "vowel",
+    "glyph": "ꯑꯧ",
+    "matra": "ꯧ"
+  },
+  "k": {
+    "type": "consonant",
+    "glyph": "ꯀ"
+  },
+  "kh": {
+    "type": "consonant",
+    "glyph": "ꯈ"
+  },
+  "g": {
+    "type": "consonant",
+    "glyph": "ꯒ"
+  },
+  "gh": {
+    "type": "consonant",
+    "glyph": "ꯘ"
+  },
+  "ng": {
+    "type": "consonant",
+    "glyph": "ꯉ"
+  },
+  "ch": {
+    "type": "consonant",
+    "glyph": "ꯆ"
+  },
+  "chh": {
+    "type": "consonant",
+    "glyph": "ꯆ"
+  },
+  "j": {
+    "type": "consonant",
+    "glyph": "ꯖ"
+  },
+  "jh": {
+    "type": "consonant",
+    "glyph": "ꯓ"
+  },
+  "ny": {
+    "type": "consonant",
+    "glyph": "ꯅ"
+  },
+  "T": {
+    "type": "consonant",
+    "glyph": "ꯇ"
+  },
+  "Th": {
+    "type": "consonant",
+    "glyph": "ꯊ"
+  },
+  "D": {
+    "type": "consonant",
+    "glyph": "ꯗ"
+  },
+  "Dh": {
+    "type": "consonant",
+    "glyph": "ꯙ"
+  },
+  "N": {
+    "type": "consonant",
+    "glyph": "ꯅ"
+  },
+  "t": {
+    "type": "consonant",
+    "glyph": "ꯇ"
+  },
+  "th": {
+    "type": "consonant",
+    "glyph": "ꯊ"
+  },
+  "d": {
+    "type": "consonant",
+    "glyph": "ꯗ"
+  },
+  "dh": {
+    "type": "consonant",
+    "glyph": "ꯙ"
+  },
+  "n": {
+    "type": "consonant",
+    "glyph": "ꯅ"
+  },
+  "p": {
+    "type": "consonant",
+    "glyph": "ꯄ"
+  },
+  "ph": {
+    "type": "consonant",
+    "glyph": "ꯐ"
+  },
+  "b": {
+    "type": "consonant",
+    "glyph": "ꯕ"
+  },
+  "bh": {
+    "type": "consonant",
+    "glyph": "ꯚ"
+  },
+  "m": {
+    "type": "consonant",
+    "glyph": "ꯃ"
+  },
+  "y": {
+    "type": "consonant",
+    "glyph": "ꯌ"
+  },
+  "r": {
+    "type": "consonant",
+    "glyph": "ꯔ"
+  },
+  "l": {
+    "type": "consonant",
+    "glyph": "ꯂ"
+  },
+  "v": {
+    "type": "consonant",
+    "glyph": "ꯋ"
+  },
+  "sh": {
+    "type": "consonant",
+    "glyph": "ꯁ"
+  },
+  "Sh": {
+    "type": "consonant",
+    "glyph": "ꯁ"
+  },
+  "s": {
+    "type": "consonant",
+    "glyph": "ꯁ"
+  },
+  "h": {
+    "type": "consonant",
+    "glyph": "ꯍ"
+  },
+  "M": {
+    "type": "mark",
+    "glyph": "ꯪ"
+  },
+  "MM": {
+    "type": "mark",
+    "glyph": "ꯪ"
+  },
+  "H": {
+    "type": "mark",
+    "glyph": "ꯍ꯭"
+  }
+}

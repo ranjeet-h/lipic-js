@@ -22,16 +22,49 @@ function isWordEnd(tokens: Token[], index: number): boolean {
   return !next || isWordBoundaryToken(next);
 }
 
+interface SchwaProfile {
+  convertAnusvaraWordEndToAkar: boolean;
+  convertKayWordEnd: boolean;
+  convertQaWordEndToAkar: boolean;
+  marathiVerbTayRule: boolean;
+  marathiVerbTosRule: boolean;
+}
+
+const DEFAULT_DEVANAGARI_PROFILE: SchwaProfile = {
+  convertAnusvaraWordEndToAkar: true,
+  convertKayWordEnd: false,
+  convertQaWordEndToAkar: true,
+  marathiVerbTayRule: false,
+  marathiVerbTosRule: false
+};
+
+const MARATHI_FAMILY_PROFILE: SchwaProfile = {
+  convertAnusvaraWordEndToAkar: true,
+  convertKayWordEnd: true,
+  convertQaWordEndToAkar: true,
+  marathiVerbTayRule: true,
+  marathiVerbTosRule: true
+};
+
+function resolveSchwaProfile(languageId?: string): SchwaProfile {
+  if (languageId === "marathi" || languageId === "konkani") {
+    return MARATHI_FAMILY_PROFILE;
+  }
+  return DEFAULT_DEVANAGARI_PROFILE;
+}
+
 export const applySchwaRule: RuleFn = (tokens: Token[], _ctx: RuleContext): Token[] => {
   if (_ctx.script.kind !== "devanagari" || _ctx.languageId === "sanskrit") {
     return tokens;
   }
 
+  const profile = resolveSchwaProfile(_ctx.languageId);
   const out = tokens.map((t) => ({ ...t } as Token));
 
   for (let i = 0; i < out.length; i += 1) {
     // Pattern: ... ं + consonant + inherentA at word end => ... ं + consonant + ा
     if (
+      profile.convertAnusvaraWordEndToAkar &&
       isMarkGlyph(out[i], _ctx.script.anusvara) &&
       isKind(out[i + 1], "consonant") &&
       isKind(out[i + 2], "inherentA") &&
@@ -42,6 +75,7 @@ export const applySchwaRule: RuleFn = (tokens: Token[], _ctx: RuleContext): Toke
 
     // Pattern: क + inherentA + य at word end => काय
     if (
+      profile.convertKayWordEnd &&
       isConsonantGlyph(out[i], "क") &&
       isKind(out[i + 1], "inherentA") &&
       isConsonantGlyph(out[i + 2], "य") &&
@@ -52,6 +86,7 @@ export const applySchwaRule: RuleFn = (tokens: Token[], _ctx: RuleContext): Toke
 
     // Pattern: क़ + inherentA at word end => क़ा (qa / k*a expectation)
     if (
+      profile.convertQaWordEndToAkar &&
       isConsonantGlyph(out[i], "क़") &&
       isKind(out[i + 1], "inherentA") &&
       isWordEnd(out, i + 1)
@@ -61,6 +96,7 @@ export const applySchwaRule: RuleFn = (tokens: Token[], _ctx: RuleContext): Toke
 
     // Verb family: ... र् + त + inherentA + य at word end => ... र + त + ा + य
     if (
+      profile.marathiVerbTayRule &&
       isConsonantGlyph(out[i], "र") &&
       isKind(out[i + 1], "halant") &&
       isConsonantGlyph(out[i + 2], "त") &&
@@ -74,6 +110,7 @@ export const applySchwaRule: RuleFn = (tokens: Token[], _ctx: RuleContext): Toke
 
     // Verb family: ... र् + त + ो + स at word end => ... र + त + ो + स
     if (
+      profile.marathiVerbTosRule &&
       isConsonantGlyph(out[i], "र") &&
       isKind(out[i + 1], "halant") &&
       isConsonantGlyph(out[i + 2], "त") &&

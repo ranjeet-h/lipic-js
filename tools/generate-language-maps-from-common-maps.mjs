@@ -17,7 +17,21 @@ const LANGUAGE_TARGETS = [
   { code: "te", folder: "telugu", scriptToml: "telugu.toml", template: "hindi", keepWords: false, scriptNukta: "", overrides: {} },
   { code: "kn", folder: "kannada", scriptToml: "kannada.toml", template: "hindi", keepWords: false, scriptNukta: "಼", overrides: {} },
   { code: "ml", folder: "malayalam", scriptToml: "malayalam.toml", template: "hindi", keepWords: false, scriptNukta: "", overrides: {} },
-  { code: "or", folder: "odia", scriptToml: "oriya.toml", template: "hindi", keepWords: false, scriptNukta: "଼", overrides: {} }
+  { code: "or", folder: "odia", scriptToml: "oriya.toml", template: "hindi", keepWords: false, scriptNukta: "଼", overrides: {} },
+  { code: "kok", folder: "konkani", scriptToml: "devanagari.toml", template: "marathi", keepWords: false, scriptNukta: "़", overrides: {} },
+  { code: "mai", folder: "maithili", scriptToml: "devanagari.toml", template: "hindi", keepWords: false, scriptNukta: "़", overrides: {} },
+  { code: "doi", folder: "dogri", scriptToml: "devanagari.toml", template: "hindi", keepWords: false, scriptNukta: "़", overrides: {} },
+  { code: "brx", folder: "bodo", scriptToml: "devanagari.toml", template: "hindi", keepWords: false, scriptNukta: "़", overrides: {} },
+  { code: "sd", folder: "sindhi", scriptToml: "devanagari.toml", template: "hindi", keepWords: false, scriptNukta: "़", overrides: {} },
+  { code: "hne", folder: "chhattisgarhi", scriptToml: "devanagari.toml", template: "hindi", keepWords: false, scriptNukta: "़", overrides: {} },
+  { code: "bho", folder: "bhojpuri", scriptToml: "devanagari.toml", template: "hindi", keepWords: false, scriptNukta: "़", overrides: {} },
+  { code: "raj", folder: "rajasthani", scriptToml: "devanagari.toml", template: "hindi", keepWords: false, scriptNukta: "़", overrides: {} },
+  { code: "awa", folder: "awadhi", scriptToml: "devanagari.toml", template: "hindi", keepWords: false, scriptNukta: "़", overrides: {} },
+  { code: "mni", folder: "manipuri", scriptToml: "manipuri.toml", template: "hindi", keepWords: false, scriptNukta: "", overrides: {} },
+  { code: "sat", folder: "santali", scriptToml: "ol_chiki.toml", template: "hindi", keepWords: false, scriptNukta: "", overrides: {} },
+  { code: "ur", folder: "urdu", scriptToml: "urdu.toml", template: "hindi", keepWords: false, scriptNukta: "", overrides: {} },
+  { code: "ks", folder: "kashmiri", scriptToml: "urdu.toml", template: "hindi", keepWords: false, scriptNukta: "", overrides: {} },
+  { code: "si", folder: "sinhala", scriptToml: "sinhala.toml", template: "hindi", keepWords: false, scriptNukta: "", overrides: {} }
 ];
 
 function readJson(filePath) {

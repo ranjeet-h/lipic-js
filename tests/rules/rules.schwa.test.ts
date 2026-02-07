@@ -1,10 +1,16 @@
 import { describe, expect, it } from "vitest";
 
+import hindiExpanded from "../../maps/hindi/phonetic.expanded.json";
 import marathiExpanded from "../../maps/marathi/phonetic.expanded.json";
 import { createTransliterationEngine } from "../../src/engine/transliteration-engine";
 
-function applyInput(input: string, options?: Parameters<typeof createTransliterationEngine>[0]["rules"]): string {
-  const engine = createTransliterationEngine({ expandedMap: marathiExpanded, rules: options });
+function applyInput(
+  input: string,
+  map: Record<string, { type: string; glyph: string; matra?: string }>,
+  options?: Parameters<typeof createTransliterationEngine>[0]["rules"],
+  languageId?: string
+): string {
+  const engine = createTransliterationEngine({ expandedMap: map, rules: options, languageId });
   let host = "";
   for (const ch of input) {
     const edit = engine.processChar(ch);
@@ -15,18 +21,22 @@ function applyInput(input: string, options?: Parameters<typeof createTranslitera
 
 describe("schwa rule", () => {
   it("renders kay", () => {
-    expect(applyInput("kay")).toBe("काय");
+    expect(applyInput("kay", marathiExpanded, undefined, "marathi")).toBe("काय");
   });
 
   it("renders kartay", () => {
-    expect(applyInput("kartay")).toBe("करताय");
+    expect(applyInput("kartay", marathiExpanded, undefined, "marathi")).toBe("करताय");
   });
 
   it("renders kartos", () => {
-    expect(applyInput("kartos")).toBe("करतोस");
+    expect(applyInput("kartos", marathiExpanded, undefined, "marathi")).toBe("करतोस");
   });
 
   it("can disable schwa deletion", () => {
-    expect(applyInput("kartay", { enableSchwaDeletion: false })).toBe("कर्तय");
+    expect(applyInput("kartay", marathiExpanded, { enableSchwaDeletion: false }, "marathi")).toBe("कर्तय");
+  });
+
+  it("keeps Marathi-specific endings disabled for Hindi profile", () => {
+    expect(applyInput("kartay", hindiExpanded, undefined, "hindi")).toBe("कर्तय");
   });
 });

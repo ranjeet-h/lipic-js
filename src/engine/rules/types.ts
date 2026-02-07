@@ -1,5 +1,11 @@
 export type NasalizationMode = "anusvara" | "panchamakshar";
 
+export interface NasalizationProfile {
+  nasalConsonants: Set<string>;
+  vargaConsonants: Set<string>;
+  panchamaByConsonant: Map<string, string>;
+}
+
 export interface ScriptRuleConfig {
   scriptId: string;
   kind: "devanagari" | "generic";
@@ -28,6 +34,7 @@ export interface RuleContext {
   options: EngineRuleOptions;
   script: ScriptRuleConfig;
   languageId?: string;
+  nasalizationProfile?: NasalizationProfile;
 }
 
 export type RuleFn = (tokens: Token[], ctx: RuleContext) => Token[];

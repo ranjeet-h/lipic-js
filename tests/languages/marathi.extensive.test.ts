@@ -10,7 +10,10 @@ function applyEdit(host: string, edit: Edit): string {
 }
 
 function transliterate(input: string): string {
-  const engine = createTransliterationEngine({ expandedMap: marathiExpanded });
+  const engine = createTransliterationEngine({
+    expandedMap: marathiExpanded,
+    languageId: "marathi"
+  });
   let host = "";
   for (const ch of input) {
     host = applyEdit(host, engine.processChar(ch));
@@ -117,7 +120,10 @@ describe("marathi transliteration (extensive)", () => {
   });
 
   it("supports smart backspace rewriting", () => {
-    const engine = createTransliterationEngine({ expandedMap: marathiExpanded });
+    const engine = createTransliterationEngine({
+      expandedMap: marathiExpanded,
+      languageId: "marathi"
+    });
     let host = "";
 
     host = applyEdit(host, engine.processChar("k"));

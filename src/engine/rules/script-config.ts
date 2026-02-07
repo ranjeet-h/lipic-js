@@ -16,7 +16,11 @@ const SCRIPT_CONFIGS: Array<{
   { scriptId: "tamil", match: /[\u0B80-\u0BFF]/u, halant: "்", anusvara: "ஂ", nukta: "" },
   { scriptId: "telugu", match: /[\u0C00-\u0C7F]/u, halant: "్", anusvara: "ం", nukta: "" },
   { scriptId: "kannada", match: /[\u0C80-\u0CFF]/u, halant: "್", anusvara: "ಂ", nukta: "಼" },
-  { scriptId: "malayalam", match: /[\u0D00-\u0D7F]/u, halant: "്", anusvara: "ം", nukta: "" }
+  { scriptId: "malayalam", match: /[\u0D00-\u0D7F]/u, halant: "്", anusvara: "ം", nukta: "" },
+  { scriptId: "meitei", match: /[\uABC0-\uABFF]/u, halant: "꯭", anusvara: "ꯪ", nukta: "" },
+  { scriptId: "olchiki", match: /[\u1C50-\u1C7F]/u, halant: "", anusvara: "ᱝ", nukta: "" },
+  { scriptId: "persoarabic", match: /[\u0600-\u06FF\u0750-\u077F\uFB50-\uFDFF\uFE70-\uFEFF]/u, halant: "ْ", anusvara: "ں", nukta: "" },
+  { scriptId: "sinhala", match: /[\u0D80-\u0DFF]/u, halant: "්", anusvara: "ං", nukta: "" },
 ];
 
 export function getScriptRuleConfig(scriptId: string): ScriptRuleConfig | null {

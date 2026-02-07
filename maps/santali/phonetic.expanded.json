@@ -1,0 +1,273 @@
+{
+  "a": {
+    "type": "vowel",
+    "glyph": "ᱚ",
+    "matra": ""
+  },
+  "A": {
+    "type": "vowel",
+    "glyph": "ᱟ",
+    "matra": "ᱟ"
+  },
+  "aa": {
+    "type": "vowel",
+    "glyph": "ᱟ",
+    "matra": "ᱟ"
+  },
+  "i": {
+    "type": "vowel",
+    "glyph": "ᱤ",
+    "matra": "ᱤ"
+  },
+  "I": {
+    "type": "vowel",
+    "glyph": "ᱤᱻ",
+    "matra": "ᱤᱻ"
+  },
+  "ii": {
+    "type": "vowel",
+    "glyph": "ᱤᱻ",
+    "matra": "ᱤᱻ"
+  },
+  "u": {
+    "type": "vowel",
+    "glyph": "ᱩ",
+    "matra": "ᱩ"
+  },
+  "U": {
+    "type": "vowel",
+    "glyph": "ᱩᱻ",
+    "matra": "ᱩᱻ"
+  },
+  "uu": {
+    "type": "vowel",
+    "glyph": "ᱩᱻ",
+    "matra": "ᱩᱻ"
+  },
+  "ri": {
+    "type": "vowel",
+    "glyph": "ᱨᱩ",
+    "matra": "ᱨᱩ"
+  },
+  "R": {
+    "type": "vowel",
+    "glyph": "ᱨᱩ",
+    "matra": "ᱨᱩ"
+  },
+  "e": {
+    "type": "vowel",
+    "glyph": "ᱮ",
+    "matra": "ᱮ"
+  },
+  "ai": {
+    "type": "vowel",
+    "glyph": "ᱚᱤ",
+    "matra": "ᱚᱤ"
+  },
+  "o": {
+    "type": "vowel",
+    "glyph": "ᱳ",
+    "matra": "ᱳ"
+  },
+  "au": {
+    "type": "vowel",
+    "glyph": "ᱚᱩ",
+    "matra": "ᱚᱩ"
+  },
+  "k": {
+    "type": "consonant",
+    "glyph": "ᱠᱚ"
+  },
+  "kh": {
+    "type": "consonant",
+    "glyph": "ᱠᱷᱚ"
+  },
+  "g": {
+    "type": "consonant",
+    "glyph": "ᱜᱚ"
+  },
+  "gh": {
+    "type": "consonant",
+    "glyph": "ᱜᱷᱚ"
+  },
+  "ng": {
+    "type": "consonant",
+    "glyph": "ᱶᱚ"
+  },
+  "ch": {
+    "type": "consonant",
+    "glyph": "ᱪᱚ"
+  },
+  "chh": {
+    "type": "consonant",
+    "glyph": "ᱪᱷᱚ"
+  },
+  "j": {
+    "type": "consonant",
+    "glyph": "ᱡᱚ"
+  },
+  "jh": {
+    "type": "consonant",
+    "glyph": "ᱡᱷᱚ"
+  },
+  "ny": {
+    "type": "consonant",
+    "glyph": "ᱧᱚ"
+  },
+  "T": {
+    "type": "consonant",
+    "glyph": "ᱴᱚ"
+  },
+  "Th": {
+    "type": "consonant",
+    "glyph": "ᱴᱷᱚ"
+  },
+  "D": {
+    "type": "consonant",
+    "glyph": "ᱰᱚ"
+  },
+  "Dh": {
+    "type": "consonant",
+    "glyph": "ᱰᱷᱚ"
+  },
+  "N": {
+    "type": "consonant",
+    "glyph": "ᱬᱚ"
+  },
+  "t": {
+    "type": "consonant",
+    "glyph": "ᱛᱚ"
+  },
+  "th": {
+    "type": "consonant",
+    "glyph": "ᱛᱷᱚ"
+  },
+  "d": {
+    "type": "consonant",
+    "glyph": "ᱫᱚ"
+  },
+  "dh": {
+    "type": "consonant",
+    "glyph": "ᱫᱷᱚ"
+  },
+  "n": {
+    "type": "consonant",
+    "glyph": "ᱱᱚ"
+  },
+  "p": {
+    "type": "consonant",
+    "glyph": "ᱯᱚ"
+  },
+  "ph": {
+    "type": "consonant",
+    "glyph": "ᱯᱷᱚ"
+  },
+  "b": {
+    "type": "consonant",
+    "glyph": "ᱵᱚ"
+  },
+  "bh": {
+    "type": "consonant",
+    "glyph": "ᱵᱷᱚ"
+  },
+  "m": {
+    "type": "consonant",
+    "glyph": "ᱢᱚ"
+  },
+  "y": {
+    "type": "consonant",
+    "glyph": "ᱭᱚ"
+  },
+  "r": {
+    "type": "consonant",
+    "glyph": "ᱨᱚ"
+  },
+  "l": {
+    "type": "consonant",
+    "glyph": "ᱞᱚ"
+  },
+  "v": {
+    "type": "consonant",
+    "glyph": "ᱣᱚ"
+  },
+  "w": {
+    "type": "consonant",
+    "glyph": "ᱣᱚ"
+  },
+  "sh": {
+    "type": "consonant",
+    "glyph": "ᱥᱚ"
+  },
+  "S": {
+    "type": "consonant",
+    "glyph": "ᱥᱚ"
+  },
+  "Sh": {
+    "type": "consonant",
+    "glyph": "ᱥᱚ"
+  },
+  "s": {
+    "type": "consonant",
+    "glyph": "ᱥᱚ"
+  },
+  "h": {
+    "type": "consonant",
+    "glyph": "ᱦᱚ"
+  },
+  "M": {
+    "type": "mark",
+    "glyph": "ᱝ"
+  },
+  "MM": {
+    "type": "mark",
+    "glyph": "ᱸ"
+  },
+  "H": {
+    "type": "mark",
+    "glyph": "ᱷ"
+  },
+  "ksh": {
+    "type": "conjunct",
+    "glyph": "ᱠᱥᱚ"
+  },
+  "x": {
+    "type": "conjunct",
+    "glyph": "ᱠᱥᱚ"
+  },
+  "gy": {
+    "type": "conjunct",
+    "glyph": "ᱡᱧᱚ"
+  },
+  "dny": {
+    "type": "conjunct",
+    "glyph": "ᱡᱧᱚ"
+  },
+  "jn": {
+    "type": "conjunct",
+    "glyph": "ᱡᱧᱚ"
+  },
+  "tr": {
+    "type": "conjunct",
+    "glyph": "ᱛᱚᱨᱚ"
+  },
+  "shr": {
+    "type": "conjunct",
+    "glyph": "ᱥᱚᱨᱚ"
+  },
+  "z": {
+    "type": "consonant",
+    "glyph": "ᱡᱚ"
+  },
+  "f": {
+    "type": "consonant",
+    "glyph": "ᱯᱚ"
+  },
+  "Rr": {
+    "type": "consonant",
+    "glyph": "ᱲᱚ"
+  },
+  "Rh": {
+    "type": "consonant",
+    "glyph": "ᱲᱷᱚ"
+  }
+}

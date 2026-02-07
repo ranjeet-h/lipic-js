@@ -1,80 +1,92 @@
 import type { RuleContext, RuleFn, Token } from "./types";
 
-const DEVANAGARI_NASAL_GLYPHS = new Set(["ङ", "ञ", "ण", "न", "म"]);
-
-const NASAL_OFFSETS = new Set([0x19, 0x1E, 0x23, 0x28, 0x2E]);
-
-function isNasalConsonant(glyph: string, scriptKind: string): boolean {
-  if (scriptKind === "devanagari") {
-    return DEVANAGARI_NASAL_GLYPHS.has(glyph);
+function isNasalConsonant(glyph: string, ctx: RuleContext): boolean {
+  if (ctx.nasalizationProfile?.nasalConsonants.has(glyph)) {
+    return true;
   }
-  if (glyph.length === 0) return false;
-  const cp = glyph.codePointAt(0)!;
-  if (cp < 0x0900 || cp > 0x0DFF) return false;
-  const blockBase = cp & 0xFF80;
-  const offset = cp - blockBase;
-  return NASAL_OFFSETS.has(offset);
+  if (ctx.script.kind === "devanagari") {
+    return glyph === "ङ" || glyph === "ञ" || glyph === "ण" || glyph === "न" || glyph === "म";
+  }
+  return false;
 }
 
-const VARGA_TO_NASAL: Array<{ chars: Set<string>; nasal: string }> = [
-  { chars: new Set(["क", "ख", "ग", "घ"]), nasal: "ङ" },
-  { chars: new Set(["च", "छ", "ज", "झ"]), nasal: "ञ" },
-  { chars: new Set(["ट", "ठ", "ड", "ढ"]), nasal: "ण" },
-  { chars: new Set(["त", "थ", "द", "ध"]), nasal: "न" },
-  { chars: new Set(["प", "फ", "ब", "भ"]), nasal: "म" }
-];
-
-const VARGA_GROUPS: Array<{ offsets: Set<number>; nasalOffset: number }> = [
-  { offsets: new Set([0x15, 0x16, 0x17, 0x18]), nasalOffset: 0x19 },
-  { offsets: new Set([0x1A, 0x1B, 0x1C, 0x1D]), nasalOffset: 0x1E },
-  { offsets: new Set([0x1F, 0x20, 0x21, 0x22]), nasalOffset: 0x23 },
-  { offsets: new Set([0x24, 0x25, 0x26, 0x27]), nasalOffset: 0x28 },
-  { offsets: new Set([0x2A, 0x2B, 0x2C, 0x2D]), nasalOffset: 0x2E }
-];
-
-function isVargaConsonant(glyph: string, scriptKind: string): boolean {
-  if (scriptKind === "devanagari") {
-    return mappedPanchamaDevanagari(glyph) !== null;
+function isVargaConsonant(glyph: string, ctx: RuleContext): boolean {
+  if (ctx.nasalizationProfile?.vargaConsonants.has(glyph)) {
+    return true;
   }
-  if (glyph.length === 0) return false;
-  const cp = glyph.codePointAt(0)!;
-  if (cp < 0x0900 || cp > 0x0DFF) return false;
-  const blockBase = cp & 0xFF80;
-  const offset = cp - blockBase;
-  return VARGA_GROUPS.some(g => g.offsets.has(offset));
+  if (ctx.script.kind !== "devanagari") {
+    return false;
+  }
+  return (
+    glyph === "क" ||
+    glyph === "ख" ||
+    glyph === "ग" ||
+    glyph === "घ" ||
+    glyph === "च" ||
+    glyph === "छ" ||
+    glyph === "ज" ||
+    glyph === "झ" ||
+    glyph === "ट" ||
+    glyph === "ठ" ||
+    glyph === "ड" ||
+    glyph === "ढ" ||
+    glyph === "त" ||
+    glyph === "थ" ||
+    glyph === "द" ||
+    glyph === "ध" ||
+    glyph === "प" ||
+    glyph === "फ" ||
+    glyph === "ब" ||
+    glyph === "भ"
+  );
 }
 
-function mappedPanchamaDevanagari(target: string): string | null {
-  for (const group of VARGA_TO_NASAL) {
-    if (group.chars.has(target)) {
-      return group.nasal;
-    }
+function mappedPanchama(target: string, ctx: RuleContext): string | null {
+  const mapped = ctx.nasalizationProfile?.panchamaByConsonant.get(target);
+  if (mapped) {
+    return mapped;
   }
+  if (ctx.script.kind !== "devanagari") {
+    return null;
+  }
+  if (target === "क" || target === "ख" || target === "ग" || target === "घ") return "ङ";
+  if (target === "च" || target === "छ" || target === "ज" || target === "झ") return "ञ";
+  if (target === "ट" || target === "ठ" || target === "ड" || target === "ढ") return "ण";
+  if (target === "त" || target === "थ" || target === "द" || target === "ध") return "न";
+  if (target === "प" || target === "फ" || target === "ब" || target === "भ") return "म";
   return null;
 }
 
-function mappedPanchama(target: string, scriptKind: string): string | null {
-  if (scriptKind === "devanagari") {
-    return mappedPanchamaDevanagari(target);
+function isShortGurmukhiVowelBefore(tokens: Token[], index: number): boolean {
+  const prev = tokens[index - 1];
+  if (!prev) {
+    return false;
   }
-  if (target.length === 0) return null;
-  const cp = target.codePointAt(0)!;
-  if (cp < 0x0900 || cp > 0x0DFF) return null;
-  const blockBase = cp & 0xFF80;
-  const offset = cp - blockBase;
-  for (const group of VARGA_GROUPS) {
-    if (group.offsets.has(offset)) {
-      return String.fromCodePoint(blockBase + group.nasalOffset);
-    }
+
+  if (prev.kind === "inherentA") {
+    return true;
   }
-  return null;
+
+  if (prev.kind === "matra") {
+    return prev.glyph === "ਿ" || prev.glyph === "ੁ" || prev.glyph === "੃";
+  }
+
+  if (prev.kind === "vowelIndependent") {
+    return prev.glyph === "ਅ" || prev.glyph === "ਇ" || prev.glyph === "ਉ";
+  }
+
+  return false;
+}
+
+function anusvaraForContext(tokens: Token[], index: number, ctx: RuleContext): string {
+  if (ctx.script.scriptId !== "gurmukhi") {
+    return ctx.script.anusvara;
+  }
+  return isShortGurmukhiVowelBefore(tokens, index) ? "ੰ" : "ਂ";
 }
 
 export const applyNasalizationRule: RuleFn = (tokens: Token[], ctx: RuleContext): Token[] => {
-  const effectiveMode =
-    ctx.options.nasalizationMode === "panchamakshar" && ctx.script.kind !== "devanagari"
-      ? "anusvara"
-      : ctx.options.nasalizationMode;
+  const effectiveMode = ctx.options.nasalizationMode;
 
   const out: Token[] = [];
 
@@ -85,7 +97,7 @@ export const applyNasalizationRule: RuleFn = (tokens: Token[], ctx: RuleContext)
 
     const isNasalCluster =
       t0?.kind === "consonant" &&
-      isNasalConsonant(t0.glyph, ctx.script.kind) &&
+      isNasalConsonant(t0.glyph, ctx) &&
       t1?.kind === "halant" &&
       t2?.kind === "consonant";
 
@@ -95,8 +107,8 @@ export const applyNasalizationRule: RuleFn = (tokens: Token[], ctx: RuleContext)
     }
 
     if (effectiveMode === "anusvara") {
-      if (isVargaConsonant(t2.glyph, ctx.script.kind)) {
-        out.push({ kind: "mark", glyph: ctx.script.anusvara });
+      if (isVargaConsonant(t2.glyph, ctx)) {
+        out.push({ kind: "mark", glyph: anusvaraForContext(tokens, i, ctx) });
         i += 1;
         continue;
       }
@@ -104,7 +116,7 @@ export const applyNasalizationRule: RuleFn = (tokens: Token[], ctx: RuleContext)
       continue;
     }
 
-    const mapped = mappedPanchama(t2.glyph, ctx.script.kind);
+    const mapped = mappedPanchama(t2.glyph, ctx);
     if (!mapped) {
       out.push(t0);
       continue;

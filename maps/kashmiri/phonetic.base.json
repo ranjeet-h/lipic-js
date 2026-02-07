@@ -1,0 +1,201 @@
+{
+  "a": {
+    "type": "vowel",
+    "glyph": "اَ",
+    "matra": ""
+  },
+  "aa": {
+    "type": "vowel",
+    "glyph": "آ",
+    "matra": "ا"
+  },
+  "i": {
+    "type": "vowel",
+    "glyph": "اِ",
+    "matra": "ِ"
+  },
+  "ii": {
+    "type": "vowel",
+    "glyph": "اِی",
+    "matra": "ِی"
+  },
+  "u": {
+    "type": "vowel",
+    "glyph": "اُ",
+    "matra": "ُ"
+  },
+  "uu": {
+    "type": "vowel",
+    "glyph": "اُو",
+    "matra": "ُو"
+  },
+  "ri": {
+    "type": "vowel",
+    "glyph": "رِ",
+    "matra": "ْرِ"
+  },
+  "e": {
+    "type": "vowel",
+    "glyph": "اے",
+    "matra": "ے"
+  },
+  "ai": {
+    "type": "vowel",
+    "glyph": "اَے",
+    "matra": "ے"
+  },
+  "o": {
+    "type": "vowel",
+    "glyph": "او",
+    "matra": "و"
+  },
+  "au": {
+    "type": "vowel",
+    "glyph": "اَو",
+    "matra": "و"
+  },
+  "k": {
+    "type": "consonant",
+    "glyph": "کَ"
+  },
+  "kh": {
+    "type": "consonant",
+    "glyph": "کھَ"
+  },
+  "g": {
+    "type": "consonant",
+    "glyph": "گَ"
+  },
+  "gh": {
+    "type": "consonant",
+    "glyph": "گھَ"
+  },
+  "ng": {
+    "type": "consonant",
+    "glyph": "نَ"
+  },
+  "ch": {
+    "type": "consonant",
+    "glyph": "چَ"
+  },
+  "chh": {
+    "type": "consonant",
+    "glyph": "چھَ"
+  },
+  "j": {
+    "type": "consonant",
+    "glyph": "جَ"
+  },
+  "jh": {
+    "type": "consonant",
+    "glyph": "جھَ"
+  },
+  "ny": {
+    "type": "consonant",
+    "glyph": "نَ"
+  },
+  "T": {
+    "type": "consonant",
+    "glyph": "ٹَ"
+  },
+  "Th": {
+    "type": "consonant",
+    "glyph": "ٹھَ"
+  },
+  "D": {
+    "type": "consonant",
+    "glyph": "ڈَ"
+  },
+  "Dh": {
+    "type": "consonant",
+    "glyph": "ڈھَ"
+  },
+  "N": {
+    "type": "consonant",
+    "glyph": "نَ"
+  },
+  "t": {
+    "type": "consonant",
+    "glyph": "تَ"
+  },
+  "th": {
+    "type": "consonant",
+    "glyph": "تھَ"
+  },
+  "d": {
+    "type": "consonant",
+    "glyph": "دَ"
+  },
+  "dh": {
+    "type": "consonant",
+    "glyph": "دھَ"
+  },
+  "n": {
+    "type": "consonant",
+    "glyph": "نَ"
+  },
+  "p": {
+    "type": "consonant",
+    "glyph": "پَ"
+  },
+  "ph": {
+    "type": "consonant",
+    "glyph": "پھَ"
+  },
+  "b": {
+    "type": "consonant",
+    "glyph": "بَ"
+  },
+  "bh": {
+    "type": "consonant",
+    "glyph": "بھَ"
+  },
+  "m": {
+    "type": "consonant",
+    "glyph": "مَ"
+  },
+  "y": {
+    "type": "consonant",
+    "glyph": "یَ"
+  },
+  "r": {
+    "type": "consonant",
+    "glyph": "رَ"
+  },
+  "l": {
+    "type": "consonant",
+    "glyph": "لَ"
+  },
+  "v": {
+    "type": "consonant",
+    "glyph": "وَ"
+  },
+  "sh": {
+    "type": "consonant",
+    "glyph": "شَ"
+  },
+  "Sh": {
+    "type": "consonant",
+    "glyph": "شَ"
+  },
+  "s": {
+    "type": "consonant",
+    "glyph": "سَ"
+  },
+  "h": {
+    "type": "consonant",
+    "glyph": "ہَ"
+  },
+  "M": {
+    "type": "mark",
+    "glyph": "ں"
+  },
+  "MM": {
+    "type": "mark",
+    "glyph": "ں"
+  },
+  "H": {
+    "type": "mark",
+    "glyph": "ہ"
+  }
+}
