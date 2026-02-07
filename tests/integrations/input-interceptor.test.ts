@@ -184,6 +184,31 @@ describe("input interceptor", () => {
     interceptor.detach();
   });
 
+  it("transliterates pending composition text on compositionend fallback", () => {
+    const el = document.createElement("textarea");
+    document.body.appendChild(el);
+    el.value = "";
+    el.setSelectionRange(0, 0);
+
+    const engine = createTransliterationEngine({ expandedMap: marathiExpanded });
+    const interceptor = createInputInterceptor({ element: el, engine });
+    interceptor.attach();
+
+    el.dispatchEvent(new CompositionEvent("compositionstart", { bubbles: true }));
+    const live = beforeInputWithType(el, "kay", "insertCompositionText");
+    expect(live.defaultPrevented).toBe(false);
+
+    // jsdom does not apply native composition text insertion automatically.
+    el.value = "kay";
+    el.setSelectionRange(3, 3);
+    el.dispatchEvent(new CompositionEvent("compositionend", { bubbles: true }));
+
+    const expected = createTransliterationEngine({ expandedMap: marathiExpanded }).processText("kay").insert;
+    expect(el.value).toBe(expected);
+
+    interceptor.detach();
+  });
+
   it("does not duplicate output across repeated composition updates before final commit", () => {
     const el = document.createElement("textarea");
     document.body.appendChild(el);

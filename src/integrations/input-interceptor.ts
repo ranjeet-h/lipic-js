@@ -62,6 +62,8 @@ export function createInputInterceptor(options: InputInterceptorOptions): InputI
   let enabled = options.enabled ?? true;
   let attached = false;
   let isComposing = false;
+  let pendingCompositionText = "";
+  let sawCompositionCommit = false;
 
   const applyEdit = (edit: Edit): boolean => {
     if (isTextInputLike(element)) {
@@ -89,10 +91,27 @@ export function createInputInterceptor(options: InputInterceptorOptions): InputI
 
   const handleCompositionStart = (): void => {
     isComposing = true;
+    pendingCompositionText = "";
+    sawCompositionCommit = false;
   };
 
   const handleCompositionEnd = (): void => {
     isComposing = false;
+    if (sawCompositionCommit || pendingCompositionText.length === 0) {
+      pendingCompositionText = "";
+      return;
+    }
+
+    // Some mobile keyboards only emit live composition updates and insert raw text natively.
+    // If the field currently ends with that raw composed text, replace that suffix with transliteration.
+    const fallbackEdit = engine.processText(pendingCompositionText);
+    const replaceSuffixEdit: Edit = { backspace: pendingCompositionText.length, insert: fallbackEdit.insert };
+    if (applyEdit(replaceSuffixEdit)) {
+      engine.commit();
+    } else {
+      engine.reset();
+    }
+    pendingCompositionText = "";
   };
 
   const handleKeydown = (evt: KeyboardEvent): void => {
@@ -140,6 +159,12 @@ export function createInputInterceptor(options: InputInterceptorOptions): InputI
       return;
     }
 
+    if (isComposing && evt.inputType === "insertCompositionText") {
+      pendingCompositionText = evt.data ?? pendingCompositionText;
+      onBypass?.("composition");
+      return;
+    }
+
     if (isComposing && !isCompositionCommitInputType(evt.inputType)) {
       onBypass?.("composition");
       return;
@@ -163,6 +188,8 @@ export function createInputInterceptor(options: InputInterceptorOptions): InputI
     // Mobile keyboards often finalize words through replacement/composition commit events.
     // Commit engine state so the next token starts fresh instead of rewriting prior text.
     if (isCompositionCommitInputType(evt.inputType)) {
+      sawCompositionCommit = true;
+      pendingCompositionText = "";
       engine.commit();
     }
 

@@ -190,6 +190,22 @@ window.clearAllInputs = function() {
 
 function setupEventListeners() {
   const attachTracking = (element, elementId, keystrokesId, counterId) => {
+    let pendingCompositionText = "";
+    let sawCompositionCommitInsert = false;
+
+    element.addEventListener("compositionstart", () => {
+      pendingCompositionText = "";
+      sawCompositionCommitInsert = false;
+    });
+
+    element.addEventListener("compositionend", () => {
+      if (!sawCompositionCommitInsert && pendingCompositionText) {
+        handleKeystroke(elementId, keystrokesId, pendingCompositionText);
+      }
+      pendingCompositionText = "";
+      sawCompositionCommitInsert = false;
+    });
+
     element.addEventListener("beforeinput", (evt) => {
       if (!(evt instanceof InputEvent)) return;
 
@@ -198,12 +214,20 @@ function setupEventListeners() {
         return;
       }
 
+      if (evt.inputType === "insertCompositionText") {
+        pendingCompositionText = evt.data ?? pendingCompositionText;
+        return;
+      }
+
       if (
         evt.inputType === "insertText" ||
         evt.inputType === "insertReplacementText" ||
-        evt.inputType === "insertCompositionText" ||
         evt.inputType === "insertFromComposition"
       ) {
+        if (evt.inputType === "insertReplacementText" || evt.inputType === "insertFromComposition") {
+          sawCompositionCommitInsert = true;
+          pendingCompositionText = "";
+        }
         handleKeystroke(elementId, keystrokesId, evt.data ?? "");
         return;
       }
@@ -365,9 +389,18 @@ async function attachForLanguage(languageCode, wasmMode) {
   updateRuntimeNote([textareaEngine, inputEngine, contenteditableEngine], wasmMode, config);
 
   interceptors = [
-    createInputInterceptor({ element: textarea, engine: textareaEngine }),
-    createInputInterceptor({ element: input, engine: inputEngine }),
-    createInputInterceptor({ element: contenteditable, engine: contenteditableEngine })
+    createInputInterceptor({
+      element: textarea,
+      engine: textareaEngine
+    }),
+    createInputInterceptor({
+      element: input,
+      engine: inputEngine
+    }),
+    createInputInterceptor({
+      element: contenteditable,
+      engine: contenteditableEngine
+    })
   ];
   for (const interceptor of interceptors) interceptor.attach();
 
