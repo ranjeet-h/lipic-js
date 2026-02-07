@@ -90,11 +90,6 @@ for (const el of [textarea, input, contenteditable]) {
 
 let interceptors = [];
 const packCache = new Map();
-const fallbackEngines = {
-  ta: null,
-  txt: null,
-  ce: null
-};
 
 const keystrokeBuffers = {
   ta: "",
@@ -142,49 +137,6 @@ function clearKeystrokes(elementId, keystrokesId) {
 
 function getElementTextValue(element) {
   return element.isContentEditable ? element.innerText : element.value;
-}
-
-function setElementTextValue(element, value) {
-  if (element.isContentEditable) {
-    element.innerText = value;
-    return;
-  }
-  element.value = value;
-}
-
-function setCaretToEnd(element) {
-  if (element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement) {
-    const pos = element.value.length;
-    element.setSelectionRange(pos, pos);
-    return;
-  }
-
-  if (element.isContentEditable) {
-    const selection = window.getSelection();
-    if (!selection) return;
-    const range = document.createRange();
-    range.selectNodeContents(element);
-    range.collapse(false);
-    selection.removeAllRanges();
-    selection.addRange(range);
-  }
-}
-
-function repairNativeLeakIfNeeded(element, elementId) {
-  const fallbackEngine = fallbackEngines[elementId];
-  if (!fallbackEngine) return;
-
-  const currentValue = getElementTextValue(element) || "";
-  if (!/[A-Za-z]/.test(currentValue)) return;
-
-  fallbackEngine.reset();
-  const repaired = fallbackEngine.processText(currentValue).insert;
-  fallbackEngine.commit();
-
-  if (repaired === currentValue) return;
-
-  setElementTextValue(element, repaired);
-  setCaretToEnd(element);
 }
 
 function updateCharacterCount(elementId, counterId) {
@@ -262,7 +214,6 @@ function setupEventListeners() {
     });
 
     element.addEventListener("input", () => {
-      repairNativeLeakIfNeeded(element, elementId);
       updateCharacterCount(elementId, counterId);
     });
   };
@@ -406,26 +357,12 @@ async function attachForLanguage(languageCode, wasmMode) {
   const config = getLanguageConfig(languageCode);
   for (const interceptor of interceptors) interceptor.detach();
 
-  const [
-    textareaEngine,
-    inputEngine,
-    contenteditableEngine,
-    textareaFallbackEngine,
-    inputFallbackEngine,
-    contenteditableFallbackEngine
-  ] = await Promise.all([
-    makeEngine(languageCode, wasmMode),
-    makeEngine(languageCode, wasmMode),
-    makeEngine(languageCode, wasmMode),
+  const [textareaEngine, inputEngine, contenteditableEngine] = await Promise.all([
     makeEngine(languageCode, wasmMode),
     makeEngine(languageCode, wasmMode),
     makeEngine(languageCode, wasmMode)
   ]);
   updateRuntimeNote([textareaEngine, inputEngine, contenteditableEngine], wasmMode, config);
-
-  fallbackEngines.ta = textareaFallbackEngine;
-  fallbackEngines.txt = inputFallbackEngine;
-  fallbackEngines.ce = contenteditableFallbackEngine;
 
   interceptors = [
     createInputInterceptor({ element: textarea, engine: textareaEngine }),
