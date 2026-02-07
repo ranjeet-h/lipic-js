@@ -43,7 +43,12 @@ function isCommitKey(key: string): boolean {
 }
 
 function isInsertInputType(inputType: string): boolean {
-  return inputType === "insertText" || inputType === "insertReplacementText" || inputType === "insertFromComposition";
+  return (
+    inputType === "insertText" ||
+    inputType === "insertReplacementText" ||
+    inputType === "insertFromComposition" ||
+    inputType === "insertCompositionText"
+  );
 }
 
 export function createInputInterceptor(options: InputInterceptorOptions): InputInterceptor {
@@ -132,10 +137,7 @@ export function createInputInterceptor(options: InputInterceptorOptions): InputI
       return;
     }
 
-    const allowDuringComposition =
-      evt.inputType === "insertFromComposition" || evt.inputType === "insertReplacementText";
-
-    if (isComposing && !allowDuringComposition) {
+    if (isComposing && !isInsertInputType(evt.inputType)) {
       onBypass?.("composition");
       return;
     }

@@ -117,7 +117,7 @@ describe("input interceptor", () => {
     interceptor.detach();
   });
 
-  it("suspends during composition", () => {
+  it("suspends non-insert beforeinput during composition", () => {
     const el = document.createElement("textarea");
     document.body.appendChild(el);
     el.value = "";
@@ -129,7 +129,7 @@ describe("input interceptor", () => {
     interceptor.attach();
 
     el.dispatchEvent(new CompositionEvent("compositionstart", { bubbles: true }));
-    const during = beforeInput(el, "k");
+    const during = beforeInputWithType(el, "", "deleteContentBackward");
     expect(during.defaultPrevented).toBe(false);
     expect(el.value).toBe("");
 
@@ -158,6 +158,27 @@ describe("input interceptor", () => {
 
     expect(evt.defaultPrevented).toBe(true);
     expect(el.value).toBe("नमस्ते ");
+    expect(onBypass).not.toHaveBeenCalledWith("composition");
+
+    interceptor.detach();
+  });
+
+  it("processes insertCompositionText while composing (mobile live composition path)", () => {
+    const el = document.createElement("textarea");
+    document.body.appendChild(el);
+    el.value = "";
+    el.setSelectionRange(0, 0);
+
+    const onBypass = vi.fn();
+    const engine = createTransliterationEngine({ expandedMap: marathiExpanded });
+    const interceptor = createInputInterceptor({ element: el, engine, onBypass });
+    interceptor.attach();
+
+    el.dispatchEvent(new CompositionEvent("compositionstart", { bubbles: true }));
+    const evt = beforeInputWithType(el, "na", "insertCompositionText");
+
+    expect(evt.defaultPrevented).toBe(true);
+    expect(el.value).toBe("न");
     expect(onBypass).not.toHaveBeenCalledWith("composition");
 
     interceptor.detach();

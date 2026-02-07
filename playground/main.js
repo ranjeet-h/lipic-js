@@ -80,6 +80,14 @@ const langNote = document.getElementById("lang-note");
 const scriptNote = document.getElementById("script-note");
 const runtimeNote = document.getElementById("runtime-note");
 
+for (const el of [textarea, input, contenteditable]) {
+  el.setAttribute("spellcheck", "false");
+  el.setAttribute("autocorrect", "off");
+  el.setAttribute("autocapitalize", "none");
+  el.setAttribute("autocomplete", "off");
+  el.setAttribute("inputmode", "text");
+}
+
 let interceptors = [];
 const packCache = new Map();
 

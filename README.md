@@ -20,6 +20,7 @@ Fast transliteration for web text inputs (`input`, `textarea`, `contenteditable`
 - [Supported Languages](#supported-languages)
 - [Usage Options](#usage-options)
 - [Configuration](#configuration)
+- [Mobile Keyboard Notes](#mobile-keyboard-notes)
 - [Build Options](#build-options)
 - [Development](#development)
 - [Contributing](#contributing)
@@ -145,6 +146,33 @@ After `npm run build:all`, copy `dist/` to your server:
 If `dist/wasm` files are not present, the library continues with the JavaScript engine without breaking.
 
 </details>
+
+## Mobile Keyboard Notes
+
+Android/iOS keyboards (for example Samsung Keyboard, SwiftKey, Gboard) may emit composition/replacement input events instead of plain key events. `lipic-js` now handles these core event paths in the interceptor, but host setup still matters.
+
+Recommended host setup for `input`, `textarea`, and `contenteditable`:
+
+```html
+<input
+  type="text"
+  autocorrect="off"
+  autocapitalize="none"
+  autocomplete="off"
+  spellcheck="false"
+  inputmode="text"
+/>
+```
+
+Guidelines:
+- Prefer `createInputInterceptor` / `enableTransliteration` instead of custom keydown-only handlers.
+- Track composition via `compositionstart` / `compositionend` if you build custom integration.
+- Expect mobile IME paths such as `insertReplacementText`, `insertFromComposition`, and `insertCompositionText`.
+- Hard-refresh after upgrades so clients load the latest `dist` bundle.
+
+Reference implementation:
+- `playground/main.js`
+- `playground/index.html`
 
 ## Build Options
 
