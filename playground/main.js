@@ -74,6 +74,8 @@ const input = document.getElementById("txt");
 const contenteditable = document.getElementById("ce");
 const lang = document.getElementById("language");
 const wasmModeSelect = document.getElementById("wasm-mode");
+const languageCountNote = document.getElementById("language-count-note");
+const supportedLanguageCount = document.getElementById("supported-language-count");
 const langNote = document.getElementById("lang-note");
 const scriptNote = document.getElementById("script-note");
 const runtimeNote = document.getElementById("runtime-note");
@@ -284,6 +286,14 @@ function getLanguageConfig(languageCode) {
 }
 
 function populateLanguageOptions() {
+  const count = AVAILABLE_LANGUAGES.length;
+  if (languageCountNote) {
+    languageCountNote.textContent = `${count} supported languages`;
+  }
+  if (supportedLanguageCount) {
+    supportedLanguageCount.textContent = `${count} languages supported`;
+  }
+
   const current = lang.value || "hi";
   const options = AVAILABLE_LANGUAGES.map((language) => {
     const selected = language.code === current ? " selected" : "";

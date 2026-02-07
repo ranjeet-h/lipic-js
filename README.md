@@ -29,7 +29,7 @@ Fast transliteration for web text inputs (`input`, `textarea`, `contenteditable`
 
 - **Easy integration**: Works with `input`, `textarea`, and `contenteditable` elements
 - **High performance**: Hybrid JavaScript/WebAssembly runtime
-- **Multi-language support**: 13+ Indian languages across major scripts
+- **Multi-language support**: 27 Indian and South Asian languages across major scripts
 - **Flexible installation**: npm, CDN, or self-hosted
 - **Type-safe**: First-class TypeScript support
 
@@ -57,9 +57,11 @@ session.detach();
 ```
 
 ## Supported Languages
+**Total supported languages**: **27**
+
 | Script | Languages |
 |--------|-----------|
-| Devanagari | `hi` (Hindi), `mr` (Marathi), `ne` (Nepali), `sa` (Sanskrit) |
+| Devanagari | `hi` (Hindi), `mr` (Marathi), `ne` (Nepali), `sa` (Sanskrit), `kok` (Konkani), `mai` (Maithili), `doi` (Dogri), `brx` (Bodo), `sd` (Sindhi), `hne` (Chhattisgarhi), `bho` (Bhojpuri), `raj` (Rajasthani), `awa` (Awadhi) |
 | Bengali | `bn` (Bengali), `as` (Assamese) |
 | Gujarati | `gu` (Gujarati) |
 | Gurmukhi | `pa` (Punjabi) |
@@ -68,10 +70,14 @@ session.detach();
 | Kannada | `kn` (Kannada) |
 | Malayalam | `ml` (Malayalam) |
 | Odia | `or` (Odia) |
+| Meitei Mayek | `mni` (Manipuri) |
+| Ol Chiki | `sat` (Santali) |
+| Perso-Arabic | `ur` (Urdu), `ks` (Kashmiri) |
+| Sinhala | `si` (Sinhala) |
 
 ### Implementation Status
 
-**Currently Available**: `hi`, `mr`, `ne`, `sa`, `bn`, `as`, `gu`, `pa`, `ta`, `te`, `kn`, `ml`, `or`
+**Currently Available (27)**: `hi`, `mr`, `ne`, `sa`, `bn`, `as`, `gu`, `pa`, `ta`, `te`, `kn`, `ml`, `or`, `kok`, `mai`, `doi`, `brx`, `sd`, `hne`, `bho`, `raj`, `awa`, `mni`, `sat`, `ur`, `ks`, `si`
 
 ## Usage Options
 
