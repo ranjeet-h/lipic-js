@@ -4,7 +4,7 @@
 
 Fast transliteration for web text inputs (`input`, `textarea`, `contenteditable`) with a JS/WASM hybrid runtime.
 
-[![npm](https://img.shields.io/npm/v/%40ranjeet-h%2Flipic-js?label=npm)](https://www.npmjs.com/package/lipic-js)
+[![npm](https://img.shields.io/npm/v/lipic-js?label=npm)](https://www.npmjs.com/package/lipic-js)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8+-3178c6.svg)](https://www.typescriptlang.org/)
 [![Playground](https://img.shields.io/badge/Playground-Live-22c55e.svg)](https://ranjeet-h.github.io/lipic-js/playground/)
@@ -39,13 +39,19 @@ Fast transliteration for web text inputs (`input`, `textarea`, `contenteditable`
 ### Installation
 
 ```bash
-npm install @ranjeet-h/lipic-js
+npm install lipic-js
+```
+
+From GitHub (optional):
+
+```bash
+npm install github:ranjeet-h/lipic-js
 ```
 
 ### Basic Usage
 
 ```ts
-import { enableTransliteration } from "@ranjeet-h/lipic-js";
+import { enableTransliteration } from "lipic-js";
 
 // Enable transliteration for Hindi
 const session = await enableTransliteration({
@@ -85,11 +91,11 @@ session.detach();
 ### 1. npm Package
 
 ```bash
-npm install @ranjeet-h/lipic-js
+npm install lipic-js
 ```
 
 ```ts
-import { enableTransliteration } from "@ranjeet-h/lipic-js";
+import { enableTransliteration } from "lipic-js";
 
 const session = await enableTransliteration({
   language: "hi",
